@@ -1,0 +1,1368 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Z’Estell-IA</title>
+  <style>
+    :root {
+      --bg: #f3f7fb;
+      --ink: #16324f;
+      --muted: #5f7387;
+      --line: #d9e3ee;
+      --accent: #2563eb;
+      --accent-2: #0f9d58;
+      --danger: #c2410c;
+      --plum: #16324f;
+      --shadow: 0 14px 34px rgba(22, 50, 79, 0.10);
+      --radius: 14px;
+      font-family: "Avenir Next", Avenir, "Gill Sans", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 8% 0%, #ffffff 0%, transparent 32%),
+        linear-gradient(135deg, #ffffff 0%, #f3f7fb 54%, #e8eef7 100%);
+      color: var(--ink);
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 12px 0 32px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .app-header {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 14px 0 0;
+      text-align: center;
+    }
+
+    .app-name {
+      margin: 0;
+      color: var(--plum);
+      font-size: 1.15rem;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.90);
+      border: 1px solid rgba(217, 227, 238, 0.94);
+      box-shadow: var(--shadow);
+      border-radius: 10px;
+      padding: 18px;
+    }
+
+    .screen {
+      min-height: 360px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .status {
+      min-height: 24px;
+      color: var(--danger);
+      font-size: 0.95rem;
+    }
+
+    .message {
+      padding: 18px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+      border: 1px solid var(--line);
+      min-height: 110px;
+    }
+
+    .message h2,
+    .message p {
+      margin: 0;
+    }
+
+    .message h2 {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .message .final {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.2;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .message .current {
+      margin-top: 10px;
+      color: var(--accent);
+      font-weight: 800;
+      font-size: clamp(1.15rem, 2vw, 1.6rem);
+    }
+
+    .proposal {
+      display: grid;
+      gap: 8px;
+      padding: 18px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #2563eb 0%, #163f9b 100%);
+      color: white;
+    }
+
+    .proposal.secondary {
+      background: linear-gradient(135deg, #f8fafc 0%, #eef4ff 100%);
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    .proposal .small {
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .proposal.secondary .small {
+      color: var(--muted);
+    }
+
+    .proposal .big {
+      font-size: clamp(2rem, 6vw, 4rem);
+      line-height: 1;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .proposal .hint {
+      color: rgba(255, 255, 255, 0.78);
+      line-height: 1.45;
+    }
+
+    .word-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .word-option {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--ink);
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 120ms ease, border-color 120ms ease, opacity 120ms ease;
+    }
+
+    .word-option:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      background: #eef5ff;
+      opacity: 0.96;
+    }
+
+    .word-option:disabled {
+      cursor: default;
+      opacity: 0.5;
+      transform: none;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .actions .full {
+      grid-column: 1 / -1;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      border-radius: 11px;
+      padding: 14px 16px;
+      min-height: 52px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform 140ms ease, opacity 140ms ease, background 140ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { cursor: wait; opacity: 0.55; transform: none; }
+
+    .yes { background: var(--accent-2); color: white; }
+    .no { background: #d9776a; color: white; }
+    .ghost { background: #eaf1fb; color: var(--ink); }
+    .danger { background: #fee2e2; color: #991b1b; }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    input:focus {
+      outline: 3px solid rgba(189, 111, 104, 0.18);
+      border-color: var(--accent);
+    }
+
+    @media (max-width: 960px) {
+      .screen { min-height: unset; }
+    }
+
+    @media (max-width: 720px) {
+      .app-header { width: min(100% - 20px, 1180px); padding-top: 10px; }
+      .app-name { font-size: 1.05rem; }
+      main { width: min(100% - 20px, 1180px); padding-top: 10px; }
+      .card { padding: 14px; }
+      .screen { gap: 12px; }
+      .proposal, .message { padding: 14px; }
+      .proposal .big { font-size: clamp(2.1rem, 12vw, 3.2rem); }
+      .word-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .actions { grid-template-columns: 1fr 1fr; }
+      button { min-height: 56px; }
+    }
+
+    @media (max-width: 480px) {
+      .proposal .big { font-size: clamp(2.3rem, 18vw, 3rem); }
+      .message .final { font-size: clamp(1.3rem, 8vw, 2rem); }
+      .message .current { font-size: clamp(1rem, 6vw, 1.5rem); }
+      button { font-size: 0.97rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <h1 class="app-name">Z’Estell-IA</h1>
+  </header>
+  <main>
+    <section class="card screen" aria-labelledby="screen-title">
+        <div class="message" aria-live="polite">
+          <h2 id="screen-title">Message en cours</h2>
+          <div class="final" id="final-text">—</div>
+          <div class="current" id="current-word">Mot en cours : —</div>
+        </div>
+
+        <div class="field">
+          <label for="manual-word-input">Compléter le mot en cours</label>
+          <input
+            id="manual-word-input"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            autocapitalize="characters"
+            placeholder="Tapez ou complétez le mot"
+            aria-label="Compléter le mot en cours"
+          >
+        </div>
+
+        <div class="proposal">
+          <div class="small">Proposition actuelle</div>
+          <div class="big" id="proposal-text">Clique sur “Nouvelle phrase”</div>
+          <div class="hint" id="proposal-hint">Valide la proposition avec Oui pour continuer.</div>
+        </div>
+
+        <div class="proposal secondary">
+          <div class="small">Mots probables</div>
+          <div class="word-grid" id="probable-words"></div>
+        </div>
+
+        <div class="actions">
+          <button class="yes" id="yes-button">Oui</button>
+          <button class="no" id="no-button">Non</button>
+          <button class="ghost" id="validate-word-button">Valider le mot</button>
+          <button class="ghost" id="undo-button">Lettre précédente</button>
+          <button class="ghost full" id="new-button">Nouvelle phrase</button>
+          <button class="danger full" id="delete-button">Supprimer le dernier caractère</button>
+        </div>
+
+        <p class="status" id="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script>
+    const BASE_LEXICON = [
+      { word: 'JE', type: 'subject', frequency: 520 },
+      { word: 'TU', type: 'subject', frequency: 360 },
+      { word: 'IL', type: 'subject', frequency: 340 },
+      { word: 'ELLE', type: 'subject', frequency: 240 },
+      { word: 'NOUS', type: 'subject', frequency: 220 },
+      { word: 'VOUS', type: 'subject', frequency: 260 },
+      { word: 'ILS', type: 'subject', frequency: 220 },
+      { word: 'ELLES', type: 'subject', frequency: 180 },
+      { word: 'AI', type: 'verb', frequency: 610 },
+      { word: 'VEUX', type: 'verb', frequency: 420 },
+      { word: 'SUIS', type: 'verb', frequency: 300 },
+      { word: 'PEUX', type: 'verb', frequency: 290 },
+      { word: 'DOIS', type: 'verb', frequency: 250 },
+      { word: 'A', type: 'verb', frequency: 400 },
+      { word: 'MANGE', type: 'verb', frequency: 220 },
+      { word: 'ALLER', type: 'verb', frequency: 320 },
+      { word: 'DORMIR', type: 'verb', frequency: 200 },
+      { word: 'APPELER', type: 'verb', frequency: 260 },
+      { word: 'SOIF', type: 'complement', frequency: 300 },
+      { word: 'FAIM', type: 'complement', frequency: 320 },
+      { word: 'AIDE', type: 'complement', frequency: 330 },
+      { word: 'MAL', type: 'complement', frequency: 220 },
+      { word: 'EAU', type: 'complement', frequency: 300 },
+      { word: 'TOILETTE', type: 'complement', frequency: 260 },
+      { word: 'MÉDECIN', type: 'complement', frequency: 280 },
+      { word: 'MAMAN', type: 'complement', frequency: 230 },
+      { word: 'PAPA', type: 'complement', frequency: 220 },
+      { word: 'CHAMBRE', type: 'complement', frequency: 270 },
+      { word: 'MAISON', type: 'complement', frequency: 260 },
+      { word: 'DOULEUR', type: 'complement', frequency: 260 },
+      { word: 'MERCI', type: 'complement', frequency: 340 },
+      { word: 'BONJOUR', type: 'complement', frequency: 260 },
+      { word: 'BONSOIR', type: 'complement', frequency: 220 },
+      { word: 'SALUT', type: 'complement', frequency: 220 },
+      { word: 'BESOIN', type: 'complement', frequency: 300 },
+      { word: 'LIT', type: 'complement', frequency: 240 },
+      { word: 'CHAUD', type: 'complement', frequency: 200 },
+      { word: 'FROID', type: 'complement', frequency: 200 },
+      { word: 'OUI', type: 'other', frequency: 260 },
+      { word: 'NON', type: 'other', frequency: 260 },
+      { word: 'AIDE', type: 'complement', frequency: 330 },
+      { word: 'REPOS', type: 'complement', frequency: 210 },
+      { word: 'DORMIR', type: 'verb', frequency: 200 },
+      { word: 'MANGER', type: 'verb', frequency: 200 },
+      { word: 'TEMPS', type: 'complement', frequency: 220 },
+      { word: 'JOUR', type: 'complement', frequency: 230 },
+      { word: 'NUIT', type: 'complement', frequency: 220 },
+      { word: 'AMI', type: 'complement', frequency: 200 },
+      { word: 'FAMILLE', type: 'complement', frequency: 200 },
+      { word: 'VOIR', type: 'verb', frequency: 180 },
+      { word: 'VIVRE', type: 'verb', frequency: 170 },
+      { word: 'VOUVOIR', type: 'verb', frequency: 170 },
+      { word: 'BOIRE', type: 'verb', frequency: 180 },
+      { word: 'PARLER', type: 'verb', frequency: 180 },
+      { word: 'POUR', type: 'other', frequency: 140 },
+      { word: 'DE', type: 'other', frequency: 260 },
+      { word: 'DES', type: 'other', frequency: 180 },
+      { word: 'DANS', type: 'other', frequency: 150 },
+      { word: 'AVEC', type: 'other', frequency: 170 },
+      { word: 'MON', type: 'subject', frequency: 220 },
+      { word: 'MA', type: 'subject', frequency: 190 },
+      { word: 'MES', type: 'subject', frequency: 180 },
+      { word: 'NOTRE', type: 'subject', frequency: 180 },
+      { word: 'VOTRE', type: 'subject', frequency: 170 },
+      { word: 'MALADIE', type: 'complement', frequency: 190 },
+      { word: 'SEUL', type: 'complement', frequency: 150 },
+      { word: 'PEUR', type: 'complement', frequency: 160 },
+      { word: 'POUVOIR', type: 'verb', frequency: 190 },
+      { word: 'PARTIR', type: 'verb', frequency: 160 },
+      { word: 'RIRE', type: 'verb', frequency: 150 },
+      { word: 'TOMBER', type: 'verb', frequency: 130 },
+      { word: 'TOUT', type: 'other', frequency: 200 },
+      { word: 'TROP', type: 'other', frequency: 160 },
+      { word: 'TARD', type: 'other', frequency: 140 },
+      { word: 'BIEN', type: 'other', frequency: 200 },
+      { word: 'BON', type: 'other', frequency: 180 },
+      { word: 'BEAU', type: 'other', frequency: 170 },
+      { word: 'BESOIN', type: 'complement', frequency: 300 },
+      { word: 'MALADE', type: 'complement', frequency: 180 },
+      { word: 'PAPI', type: 'complement', frequency: 140 },
+      { word: 'SOUFFRIR', type: 'verb', frequency: 160 },
+      { word: 'TENIR', type: 'verb', frequency: 140 },
+      { word: 'VENIR', type: 'verb', frequency: 150 },
+      { word: 'PENSER', type: 'verb', frequency: 150 },
+      { word: 'MARCHER', type: 'verb', frequency: 150 },
+      { word: 'RESTER', type: 'verb', frequency: 140 },
+      { word: 'APPRENDRE', type: 'verb', frequency: 140 },
+      { word: 'SORTIR', type: 'verb', frequency: 150 },
+      { word: 'RÉPONDRE', type: 'verb', frequency: 140 },
+      { word: 'ATTENDRE', type: 'verb', frequency: 140 },
+      { word: 'MANGER', type: 'verb', frequency: 200 },
+      { word: 'BOUGER', type: 'verb', frequency: 150 },
+      { word: 'CHERCHER', type: 'verb', frequency: 150 },
+      { word: 'AIMER', type: 'verb', frequency: 160 },
+      { word: 'OUVRIR', type: 'verb', frequency: 150 },
+      { word: 'FERMER', type: 'verb', frequency: 140 },
+      { word: 'SAVOIR', type: 'verb', frequency: 160 },
+      { word: 'COMPRENDRE', type: 'verb', frequency: 150 },
+      { word: 'DIRE', type: 'verb', frequency: 180 },
+      { word: 'ENTENDRE', type: 'verb', frequency: 140 },
+      { word: 'CAUSER', type: 'verb', frequency: 130 },
+      { word: 'PORTER', type: 'verb', frequency: 130 },
+      { word: 'PRÉFÉRER', type: 'verb', frequency: 120 },
+      { word: 'MIEUX', type: 'other', frequency: 140 },
+      { word: 'MAINTENANT', type: 'other', frequency: 130 },
+      { word: 'PARDON', type: 'other', frequency: 140 },
+      { word: 'SILENCE', type: 'other', frequency: 120 },
+      { word: 'CALME', type: 'other', frequency: 120 },
+      { word: 'DOUCEUR', type: 'complement', frequency: 120 },
+      { word: 'FAMILLE', type: 'complement', frequency: 200 },
+      { word: 'MAMAN', type: 'complement', frequency: 230 },
+      { word: 'PAPA', type: 'complement', frequency: 220 },
+      { word: 'FRERE', type: 'complement', frequency: 180 },
+      { word: 'SOEUR', type: 'complement', frequency: 180 },
+      { word: 'CHIEN', type: 'complement', frequency: 150 },
+      { word: 'CHAT', type: 'complement', frequency: 150 },
+      { word: 'VILLE', type: 'complement', frequency: 140 },
+      { word: 'MAISON', type: 'complement', frequency: 260 },
+      { word: 'JARDIN', type: 'complement', frequency: 150 },
+      { word: 'PARKING', type: 'complement', frequency: 120 },
+      { word: 'PORTAIL', type: 'complement', frequency: 120 },
+      { word: 'MATIN', type: 'other', frequency: 150 },
+      { word: 'SOIR', type: 'other', frequency: 160 },
+      { word: 'HEURE', type: 'other', frequency: 140 },
+      { word: 'MINUTE', type: 'other', frequency: 120 },
+      { word: 'SEMAINE', type: 'other', frequency: 120 },
+      { word: 'MAGASIN', type: 'complement', frequency: 130 },
+      { word: 'MÉDICAMENT', type: 'complement', frequency: 150 },
+      { word: 'BOUTEILLE', type: 'complement', frequency: 120 },
+      { word: 'COFFRE', type: 'complement', frequency: 110 },
+      { word: 'ECOLE', type: 'complement', frequency: 140 },
+      { word: 'CINEMA', type: 'complement', frequency: 120 },
+      { word: 'ASSIS', type: 'other', frequency: 110 },
+      { word: 'DEBOUT', type: 'other', frequency: 110 },
+      { word: 'DROITE', type: 'other', frequency: 110 },
+      { word: 'GAUCHE', type: 'other', frequency: 110 },
+      { word: 'MALADE', type: 'complement', frequency: 180 },
+      { word: 'MAL', type: 'complement', frequency: 220 },
+      { word: 'DOULEUR', type: 'complement', frequency: 260 },
+      { word: 'VITAL', type: 'complement', frequency: 110 },
+      { word: 'CALME', type: 'other', frequency: 120 },
+      { word: 'DOULEUR', type: 'complement', frequency: 260 },
+      { word: 'MARCHER', type: 'verb', frequency: 150 },
+      { word: 'MANGER', type: 'verb', frequency: 200 },
+      { word: 'DORMIR', type: 'verb', frequency: 200 },
+      { word: 'AVOIR', type: 'verb', frequency: 180 },
+      { word: 'ALLER', type: 'verb', frequency: 320 },
+      { word: 'BOUGER', type: 'verb', frequency: 150 },
+      { word: 'SENTIR', type: 'verb', frequency: 140 },
+      { word: 'PRENDRE', type: 'verb', frequency: 170 },
+      { word: 'RÉVEILLER', type: 'verb', frequency: 120 },
+      { word: 'VOULAIT', type: 'verb', frequency: 150 },
+      { word: 'SUFFRE', type: 'verb', frequency: 130 },
+      { word: 'DÉSIR', type: 'other', frequency: 110 },
+      { word: 'AMOUR', type: 'complement', frequency: 140 },
+      { word: 'SEUL', type: 'complement', frequency: 150 },
+      { word: 'TÊTE', type: 'complement', frequency: 150 },
+      { word: 'VENTRE', type: 'complement', frequency: 150 },
+      { word: 'TÉLÉPHONE', type: 'complement', frequency: 150 },
+      { word: 'PORTE', type: 'complement', frequency: 140 },
+      { word: 'POCHE', type: 'complement', frequency: 120 },
+      { word: 'LUNETTES', type: 'complement', frequency: 120 },
+      { word: 'CHAUSSURES', type: 'complement', frequency: 120 },
+      { word: 'VESTE', type: 'complement', frequency: 110 },
+      { word: 'PILULE', type: 'complement', frequency: 120 },
+      { word: 'BOUTON', type: 'complement', frequency: 110 },
+      { word: 'FROID', type: 'complement', frequency: 200 },
+      { word: 'CHAUD', type: 'complement', frequency: 200 },
+      { word: 'BIEN', type: 'other', frequency: 260 },
+      { word: 'MIEUX', type: 'other', frequency: 220 },
+      { word: 'PAS', type: 'other', frequency: 240 },
+      { word: 'PLUS', type: 'other', frequency: 220 },
+      { word: 'MOINS', type: 'other', frequency: 180 },
+      { word: 'TOUJOURS', type: 'other', frequency: 180 },
+      { word: 'AUJOURD\'HUI', type: 'other', frequency: 210 },
+      { word: 'HIER', type: 'other', frequency: 180 },
+      { word: 'DEMAIN', type: 'other', frequency: 180 },
+      { word: 'DÉJÀ', type: 'other', frequency: 170 },
+      { word: 'TARD', type: 'other', frequency: 160 },
+      { word: 'TOT', type: 'other', frequency: 150 },
+      { word: 'VITE', type: 'other', frequency: 170 },
+      { word: 'LENT', type: 'other', frequency: 130 },
+      { word: 'PAIN', type: 'complement', frequency: 200 },
+      { word: 'POMME', type: 'complement', frequency: 180 },
+      { word: 'FROMAGE', type: 'complement', frequency: 170 },
+      { word: 'EAU', type: 'complement', frequency: 300 },
+      { word: 'CAFÉ', type: 'complement', frequency: 190 },
+      { word: 'THÉ', type: 'complement', frequency: 170 },
+      { word: 'LIT', type: 'complement', frequency: 240 },
+      { word: 'TABLE', type: 'complement', frequency: 220 },
+      { word: 'CHAISE', type: 'complement', frequency: 210 },
+      { word: 'BUREAU', type: 'complement', frequency: 200 },
+      { word: 'PORTE', type: 'complement', frequency: 140 },
+      { word: 'FENÊTRE', type: 'complement', frequency: 180 },
+      { word: 'SALON', type: 'complement', frequency: 170 },
+      { word: 'CUISINE', type: 'complement', frequency: 170 },
+      { word: 'CHAMBRE', type: 'complement', frequency: 270 },
+      { word: 'MÉTRO', type: 'complement', frequency: 170 },
+      { word: 'BUS', type: 'complement', frequency: 180 },
+      { word: 'TRAIN', type: 'complement', frequency: 180 },
+      { word: 'MARCHÉ', type: 'complement', frequency: 180 },
+      { word: 'MAGASIN', type: 'complement', frequency: 130 },
+      { word: 'ECOLE', type: 'complement', frequency: 140 },
+      { word: 'TRAVAIL', type: 'complement', frequency: 200 },
+      { word: 'VOISIN', type: 'complement', frequency: 150 },
+      { word: 'VOISINE', type: 'complement', frequency: 150 },
+      { word: 'PAYS', type: 'complement', frequency: 160 },
+      { word: 'MONDE', type: 'complement', frequency: 150 },
+      { word: 'MERCI', type: 'other', frequency: 340 },
+      { word: 'PARDON', type: 'other', frequency: 200 },
+      { word: 'SILENCE', type: 'other', frequency: 120 },
+      { word: 'CALME', type: 'other', frequency: 120 },
+      { word: 'TRISTE', type: 'other', frequency: 150 },
+      { word: 'HEUREUX', type: 'other', frequency: 160 },
+      { word: 'FATIGUE', type: 'complement', frequency: 180 },
+      { word: 'SOMMEIL', type: 'complement', frequency: 180 },
+      { word: 'PEUR', type: 'complement', frequency: 160 },
+      { word: 'ATTENDRE', type: 'verb', frequency: 140 },
+      { word: 'DONNER', type: 'verb', frequency: 180 },
+      { word: 'PRENDRE', type: 'verb', frequency: 170 },
+      { word: 'METTRE', type: 'verb', frequency: 160 },
+      { word: 'REGARDER', type: 'verb', frequency: 170 },
+      { word: 'ÉCRIRE', type: 'verb', frequency: 160 },
+      { word: 'OUVRIR', type: 'verb', frequency: 150 },
+      { word: 'FERMER', type: 'verb', frequency: 140 },
+      { word: 'APPUYER', type: 'verb', frequency: 150 },
+      { word: 'TRAVAILLER', type: 'verb', frequency: 180 },
+      { word: 'CHERCHER', type: 'verb', frequency: 150 },
+      { word: 'PARLER', type: 'verb', frequency: 180 },
+      { word: 'ÉCOUTER', type: 'verb', frequency: 160 },
+      { word: 'RETOURNER', type: 'verb', frequency: 150 },
+      { word: 'RÉPONDRE', type: 'verb', frequency: 140 },
+      { word: 'LAISSER', type: 'verb', frequency: 140 },
+      { word: 'JOINDRE', type: 'verb', frequency: 120 },
+      { word: 'FINIR', type: 'verb', frequency: 130 },
+      { word: 'COMMENCER', type: 'verb', frequency: 140 },
+      { word: 'SAVOIR', type: 'verb', frequency: 160 },
+      { word: 'COMPRENDRE', type: 'verb', frequency: 150 },
+      { word: 'JOUR', type: 'other', frequency: 230 },
+      { word: 'NUIT', type: 'other', frequency: 220 },
+      { word: 'SEMAINE', type: 'other', frequency: 120 },
+      { word: 'LUNDI', type: 'other', frequency: 120 },
+      { word: 'MARDI', type: 'other', frequency: 120 },
+      { word: 'MERCREDI', type: 'other', frequency: 120 },
+      { word: 'JEUDI', type: 'other', frequency: 120 },
+      { word: 'VENDREDI', type: 'other', frequency: 120 },
+      { word: 'SAMEDI', type: 'other', frequency: 120 },
+      { word: 'DIMANCHE', type: 'other', frequency: 120 },
+      { word: 'MAINTENANT', type: 'other', frequency: 130 },
+      { word: 'COMMUN', type: 'other', frequency: 110 },
+      { word: 'SIMPLE', type: 'other', frequency: 120 },
+      { word: 'FACILE', type: 'other', frequency: 140 },
+      { word: 'DIFFICILE', type: 'other', frequency: 140 },
+      { word: 'SEUL', type: 'complement', frequency: 150 },
+      { word: 'SEULE', type: 'complement', frequency: 140 },
+      { word: 'DOULEUR', type: 'complement', frequency: 260 },
+      { word: 'SOUFFRANCE', type: 'complement', frequency: 150 },
+      { word: 'GENTIL', type: 'other', frequency: 130 },
+      { word: 'GENTILLE', type: 'other', frequency: 130 },
+      { word: 'DURE', type: 'other', frequency: 120 },
+      { word: 'DUR', type: 'other', frequency: 120 },
+      { word: 'MANGER', type: 'verb', frequency: 220 },
+      { word: 'BOIRE', type: 'verb', frequency: 200 },
+      { word: 'LAVER', type: 'verb', frequency: 170 },
+      { word: 'CHANGER', type: 'verb', frequency: 160 },
+      { word: 'DÉPLACER', type: 'verb', frequency: 150 },
+      { word: 'MARCHER', type: 'verb', frequency: 180 },
+      { word: 'SENTIR', type: 'verb', frequency: 150 },
+      { word: 'APPRENDRE', type: 'verb', frequency: 150 },
+      { word: 'PARTIR', type: 'verb', frequency: 160 },
+      { word: 'RESTER', type: 'verb', frequency: 150 },
+      { word: 'TENIR', type: 'verb', frequency: 150 },
+      { word: 'ALLER', type: 'verb', frequency: 320 },
+      { word: 'POUVOIR', type: 'verb', frequency: 190 },
+      { word: 'DÉTESTER', type: 'verb', frequency: 120 },
+      { word: 'AIMER', type: 'verb', frequency: 170 },
+      { word: 'AVOIR', type: 'verb', frequency: 180 },
+      { word: 'DEMANDER', type: 'verb', frequency: 150 },
+      { word: 'RÉVEILLER', type: 'verb', frequency: 140 },
+      { word: 'DORMIR', type: 'verb', frequency: 220 },
+      { word: 'VOIR', type: 'verb', frequency: 180 },
+      { word: 'ENTRER', type: 'verb', frequency: 150 },
+      { word: 'SORTIR', type: 'verb', frequency: 160 },
+      { word: 'BAVARDER', type: 'verb', frequency: 120 },
+      { word: 'PLEURER', type: 'verb', frequency: 130 },
+      { word: 'RIRE', type: 'verb', frequency: 150 },
+      { word: 'CHANTER', type: 'verb', frequency: 120 },
+      { word: 'COURIR', type: 'verb', frequency: 140 },
+      { word: 'MANGER', type: 'verb', frequency: 220 },
+      { word: 'CUISINER', type: 'verb', frequency: 150 },
+      { word: 'SE LAVER', type: 'verb', frequency: 140 },
+      { word: 'SE COUCHER', type: 'verb', frequency: 140 },
+      { word: 'SE LEVER', type: 'verb', frequency: 140 },
+      { word: 'SE SENTIR', type: 'verb', frequency: 130 },
+      { word: 'MAISON', type: 'complement', frequency: 260 },
+      { word: 'APPARTEMENT', type: 'complement', frequency: 150 },
+      { word: 'CHAMBRE', type: 'complement', frequency: 270 },
+      { word: 'SALLE', type: 'complement', frequency: 180 },
+      { word: 'BAIN', type: 'complement', frequency: 170 },
+      { word: 'DOUCHE', type: 'complement', frequency: 170 },
+      { word: 'LIT', type: 'complement', frequency: 240 },
+      { word: 'TABLE', type: 'complement', frequency: 220 },
+      { word: 'CHAISE', type: 'complement', frequency: 210 },
+      { word: 'BUREAU', type: 'complement', frequency: 200 },
+      { word: 'PORTE', type: 'complement', frequency: 140 },
+      { word: 'FENÊTRE', type: 'complement', frequency: 180 },
+      { word: 'SALON', type: 'complement', frequency: 170 },
+      { word: 'CUISINE', type: 'complement', frequency: 170 },
+      { word: 'JARDIN', type: 'complement', frequency: 170 },
+      { word: 'BALCON', type: 'complement', frequency: 150 },
+      { word: 'PARKING', type: 'complement', frequency: 120 },
+      { word: 'VOISIN', type: 'complement', frequency: 150 },
+      { word: 'VOISINE', type: 'complement', frequency: 150 },
+      { word: 'AMI', type: 'complement', frequency: 200 },
+      { word: 'AMIE', type: 'complement', frequency: 200 },
+      { word: 'FAMILLE', type: 'complement', frequency: 200 },
+      { word: 'MAMAN', type: 'complement', frequency: 230 },
+      { word: 'PAPA', type: 'complement', frequency: 220 },
+      { word: 'FRÈRE', type: 'complement', frequency: 180 },
+      { word: 'SOEUR', type: 'complement', frequency: 180 },
+      { word: 'ENFANT', type: 'complement', frequency: 170 },
+      { word: 'ENFANTS', type: 'complement', frequency: 160 },
+      { word: 'PAIN', type: 'complement', frequency: 200 },
+      { word: 'POMME', type: 'complement', frequency: 180 },
+      { word: 'FROMAGE', type: 'complement', frequency: 170 },
+      { word: 'EAU', type: 'complement', frequency: 300 },
+      { word: 'CAFÉ', type: 'complement', frequency: 190 },
+      { word: 'THÉ', type: 'complement', frequency: 170 },
+      { word: 'LÉGUME', type: 'complement', frequency: 170 },
+      { word: 'VIANDE', type: 'complement', frequency: 170 },
+      { word: 'POISSON', type: 'complement', frequency: 180 },
+      { word: 'OEUF', type: 'complement', frequency: 160 },
+      { word: 'PÂTE', type: 'complement', frequency: 160 },
+      { word: 'RIZ', type: 'complement', frequency: 150 },
+      { word: 'SUCRE', type: 'complement', frequency: 150 },
+      { word: 'SEL', type: 'complement', frequency: 150 },
+      { word: 'MÉTRO', type: 'complement', frequency: 170 },
+      { word: 'BUS', type: 'complement', frequency: 180 },
+      { word: 'TRAIN', type: 'complement', frequency: 180 },
+      { word: 'MARCHÉ', type: 'complement', frequency: 180 },
+      { word: 'ÉCOLE', type: 'complement', frequency: 180 },
+      { word: 'TRAVAIL', type: 'complement', frequency: 200 },
+      { word: 'PAYS', type: 'complement', frequency: 160 },
+      { word: 'MONDE', type: 'complement', frequency: 150 },
+      { word: 'MAL', type: 'complement', frequency: 220 },
+      { word: 'DOULEUR', type: 'complement', frequency: 260 },
+      { word: 'FATIGUE', type: 'complement', frequency: 180 },
+      { word: 'SOMMEIL', type: 'complement', frequency: 180 },
+      { word: 'PEUR', type: 'complement', frequency: 160 },
+      { word: 'CALME', type: 'other', frequency: 120 },
+      { word: 'BIEN', type: 'other', frequency: 260 },
+      { word: 'MIEUX', type: 'other', frequency: 220 },
+      { word: 'PAS', type: 'other', frequency: 240 },
+      { word: 'PLUS', type: 'other', frequency: 220 },
+      { word: 'MOINS', type: 'other', frequency: 180 },
+      { word: 'TOUJOURS', type: 'other', frequency: 180 },
+      { word: 'AUJOURD\'HUI', type: 'other', frequency: 210 },
+      { word: 'HIER', type: 'other', frequency: 180 },
+      { word: 'DEMAIN', type: 'other', frequency: 180 },
+      { word: 'MATIN', type: 'other', frequency: 180 },
+      { word: 'SOIR', type: 'other', frequency: 180 },
+      { word: 'NUIT', type: 'other', frequency: 220 },
+      { word: 'HEURE', type: 'other', frequency: 160 },
+      { word: 'MERCI', type: 'other', frequency: 340 },
+      { word: 'PARDON', type: 'other', frequency: 200 },
+      { word: 'SALUT', type: 'other', frequency: 220 },
+      { word: 'BONJOUR', type: 'other', frequency: 260 },
+      { word: 'BONSOIR', type: 'other', frequency: 220 },
+      { word: 'SILENCE', type: 'other', frequency: 120 },
+      { word: 'TRISTE', type: 'other', frequency: 150 },
+      { word: 'HEUREUX', type: 'other', frequency: 160 },
+      { word: 'GENTIL', type: 'other', frequency: 130 },
+      { word: 'GENTILLE', type: 'other', frequency: 130 }
+    ];
+
+    const COMMON_ORAL_WORDS = [
+      { word: 'ON', type: 'subject' },
+      { word: 'AS', type: 'verb' },
+      { word: 'ES', type: 'verb' },
+      { word: 'VEUT', type: 'verb' },
+      { word: 'PEUT', type: 'verb' },
+      { word: 'DOIT', type: 'verb' },
+      { word: 'FAIT', type: 'verb' },
+      { word: 'DIT', type: 'verb' },
+      { word: 'VA', type: 'verb' },
+      { word: 'VONT', type: 'verb' },
+      { word: 'EST', type: 'verb' },
+      { word: 'LE', type: 'other' },
+      { word: 'LA', type: 'other' },
+      { word: 'LES', type: 'other' },
+      { word: 'UN', type: 'other' },
+      { word: 'UNE', type: 'other' },
+      { word: 'ET', type: 'other' },
+      { word: 'OU', type: 'other' },
+      { word: 'QUE', type: 'other' },
+      { word: 'QUI', type: 'other' },
+      { word: 'CETTE', type: 'other' },
+      { word: 'CE', type: 'other' },
+      { word: 'CA', type: 'other' },
+      { word: 'PAS', type: 'other' },
+      { word: 'ENCORE', type: 'other' },
+      { word: 'ICI', type: 'other' },
+      { word: 'LA-BAS', type: 'other' },
+      { word: 'AU', type: 'other' },
+      { word: 'AUX', type: 'other' },
+      { word: 'CHEZ', type: 'other' },
+      { word: 'SANS', type: 'other' },
+      { word: 'SUR', type: 'other' },
+      { word: 'SOUS', type: 'other' },
+      { word: 'QUAND', type: 'other' },
+      { word: 'COMME', type: 'other' },
+      { word: 'PARCE', type: 'other' },
+      { word: 'MAIS', type: 'other' },
+      { word: 'DONC', type: 'other' },
+      { word: 'VRAIMENT', type: 'other' },
+      { word: 'TRES', type: 'other' },
+      { word: 'MAINTENANT', type: 'other' },
+      { word: 'APRÈS', type: 'other' },
+      { word: 'AVANT', type: 'other' },
+      { word: 'BESOIN', type: 'complement' },
+      { word: 'ENVIE', type: 'complement' },
+      { word: 'DOULEUR', type: 'complement' },
+      { word: 'MAL', type: 'complement' },
+      { word: 'TÊTE', type: 'complement' },
+      { word: 'VENTRE', type: 'complement' },
+      { word: 'POITRINE', type: 'complement' },
+      { word: 'DOS', type: 'complement' },
+      { word: 'GORGE', type: 'complement' },
+      { word: 'SOUFFLE', type: 'complement' },
+      { word: 'RESPIRATION', type: 'complement' },
+      { word: 'NAUSÉE', type: 'complement' },
+      { word: 'VERTIGE', type: 'complement' },
+      { word: 'FIÈVRE', type: 'complement' },
+      { word: 'SOIF', type: 'complement' },
+      { word: 'FAIM', type: 'complement' },
+      { word: 'SOMMEIL', type: 'complement' },
+      { word: 'REPOS', type: 'complement' },
+      { word: 'FROID', type: 'complement' },
+      { word: 'CHAUD', type: 'complement' },
+      { word: 'CALME', type: 'complement' },
+      { word: 'LUMIÈRE', type: 'complement' },
+      { word: 'BRUIT', type: 'complement' },
+      { word: 'COUVERTURE', type: 'complement' },
+      { word: 'OREILLER', type: 'complement' },
+      { word: 'TOILETTE', type: 'complement' },
+      { word: 'DOUCHE', type: 'complement' },
+      { word: 'WC', type: 'complement' },
+      { word: 'MÉDICAMENT', type: 'complement' },
+      { word: 'INFIRMIÈRE', type: 'complement' },
+      { word: 'MÉDECIN', type: 'complement' },
+      { word: 'FAMILLE', type: 'complement' },
+      { word: 'VISITE', type: 'complement' },
+      { word: 'TÉLÉPHONE', type: 'complement' },
+      { word: 'MUSIQUE', type: 'complement' },
+      { word: 'ASSIS', type: 'other' },
+      { word: 'COUCHÉ', type: 'other' },
+      { word: 'DEBOUT', type: 'other' },
+      { word: 'VOUDRAIS', type: 'verb' },
+      { word: 'AIMERAIS', type: 'verb' },
+      { word: 'RESPIRER', type: 'verb' },
+      { word: 'TOUSSER', type: 'verb' },
+      { word: 'VOMIR', type: 'verb' },
+      { word: 'BOUGER', type: 'verb' },
+      { word: 'TOURNER', type: 'verb' },
+      { word: 'LEVER', type: 'verb' },
+      { word: 'RELEVER', type: 'verb' },
+      { word: 'CHANGER', type: 'verb' },
+      { word: 'APPELER', type: 'verb' },
+      { word: 'ATTENDRE', type: 'verb' },
+      { word: 'ARRÊTER', type: 'verb' },
+      { word: 'CONTINUER', type: 'verb' }
+    ];
+
+    const ORAL_FREQUENCIES = {
+      JE: 900, DE: 850, LE: 820, LA: 800, ET: 780, LES: 760, UN: 720, UNE: 700,
+      A: 690, EN: 670, QUE: 650, PAS: 640, POUR: 620, EST: 610, TU: 590, IL: 580,
+      ON: 570, VOUS: 550, AVEC: 530, CE: 510, CA: 500, MAIS: 490, NOUS: 480,
+      QUI: 470, OU: 450, AUX: 440, AU: 430, SUR: 420, ILS: 410, ELLE: 400,
+      AI: 390, VEUX: 380, SUIS: 370, PEUX: 360, DOIS: 350, VEUT: 340, PEUT: 330,
+      DOIT: 320, VA: 315, VONT: 300, FAIT: 295, DIT: 285, AVOIR: 280, ALLER: 275,
+      FAIRE: 270, DIRE: 265, VOIR: 255, SAVOIR: 250, POUVOIR: 245, FALLOIR: 240,
+      BIEN: 235, TRES: 230, ENCORE: 225, ICI: 220, MAINTENANT: 215, APRES: 210,
+      AVANT: 205, COMME: 200, QUAND: 195, PARCE: 190, MERCI: 185, BONJOUR: 180,
+      BESOIN: 420, ENVIE: 400, MAL: 390, DOULEUR: 380, AIDE: 370, SOIF: 360,
+      FAIM: 350, EAU: 340, TOILETTE: 330, SOMMEIL: 320, REPOS: 315, FROID: 300,
+      CHAUD: 295, CALME: 290, SOUFFLE: 280, RESPIRATION: 275, TÊTE: 270,
+      VENTRE: 265, DOS: 260, GORGE: 255, POITRINE: 250, NAUSEE: 245, VERTIGE: 240,
+      FIEVRE: 235, COUVERTURE: 230, OREILLER: 225, LUMIERE: 220, BRUIT: 215,
+      MEDICAMENT: 210, INFIRMIERE: 205, MEDECIN: 200, FAMILLE: 195, TELEPHONE: 190,
+      VISITE: 185, VOUDRAIS: 300, AIMERAIS: 290, RESPIRER: 280, BOUGER: 270,
+      TOURNER: 260, LEVER: 250, RELEVER: 245, CHANGER: 240, APPELER: 235,
+      ATTENDRE: 220, ARRETER: 215, CONTINUER: 210
+    };
+
+    const SUBJECTS = ['JE', 'TU', 'IL', 'ELLE', 'NOUS', 'VOUS', 'ILS', 'ELLES', 'ON'];
+    const VERBS = ['AI', 'AS', 'ES', 'VEUX', 'VEUT', 'SUIS', 'PEUX', 'PEUT', 'DOIS', 'DOIT', 'A', 'EST', 'VA', 'VONT', 'MANGE', 'ALLER', 'DORMIR', 'APPELER', 'VOUDRAIS', 'AIMERAIS', 'RESPIRER', 'TOUSSER', 'VOMIR', 'BOUGER', 'TOURNER', 'LEVER', 'RELEVER', 'CHANGER', 'ATTENDRE', 'ARRÊTER', 'CONTINUER'];
+    const COMPLEMENTS = ['SOIF', 'FAIM', 'AIDE', 'MAL', 'EAU', 'TOILETTE', 'MÉDECIN', 'MAMAN', 'PAPA', 'CHAMBRE', 'MAISON', 'DOULEUR', 'BESOIN', 'ENVIE', 'TÊTE', 'VENTRE', 'POITRINE', 'DOS', 'GORGE', 'SOUFFLE', 'RESPIRATION', 'NAUSÉE', 'VERTIGE', 'FIÈVRE', 'SOMMEIL', 'REPOS', 'FROID', 'CHAUD', 'CALME', 'LUMIÈRE', 'BRUIT', 'COUVERTURE', 'OREILLER', 'DOUCHE', 'WC', 'MÉDICAMENT', 'INFIRMIÈRE', 'FAMILLE', 'VISITE', 'TÉLÉPHONE', 'MUSIQUE'];
+    const PHRASE_PATTERNS = [
+      { pattern: ['JE', 'VEUX'], weight: 420 },
+      { pattern: ['JE', 'SUIS'], weight: 380 },
+      { pattern: ['JE', 'AI'], weight: 360 },
+      { pattern: ['JE', 'PEUX'], weight: 340 },
+      { pattern: ['JE', 'DOIS'], weight: 300 },
+      { pattern: ['IL', 'VEUT'], weight: 300 },
+      { pattern: ['TU', 'VEUX'], weight: 300 },
+      { pattern: ['JE', 'MANGE'], weight: 260 },
+      { pattern: ['JE', 'ALLER'], weight: 240 },
+      { pattern: ['JE', 'DORMIR'], weight: 220 },
+      { pattern: ['JE', 'AI', 'SOIF'], weight: 420 },
+      { pattern: ['JE', 'AI', 'FAIM'], weight: 420 },
+      { pattern: ['JE', 'AI', 'AIDE'], weight: 390 },
+      { pattern: ['JE', 'VEUX', 'ALLER'], weight: 380 },
+      { pattern: ['JE', 'VEUX', 'DORMIR'], weight: 360 },
+      { pattern: ['JE', 'VEUX', 'MANGER'], weight: 360 },
+      { pattern: ['JE', 'VEUX', 'BOIRE'], weight: 300 },
+      { pattern: ['JE', 'PEUX', 'ALLER'], weight: 340 },
+      { pattern: ['JE', 'PEUX', 'DORMIR'], weight: 330 },
+      { pattern: ['JE', 'DOIS', 'ALLER'], weight: 320 },
+      { pattern: ['JE', 'DOIS', 'REPOSER'], weight: 310 }
+    ];
+
+    const NATURAL_NEXT_WORDS_BY_LAST_WORD = {
+      VEUX: ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR', 'AIDE', 'EAU', 'TOILETTE', 'MÉDECIN'],
+      PEUX: ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      DOIS: ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      VEUT: ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      PEUT: ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      AI: ['SOIF', 'FAIM', 'AIDE', 'BESOIN', 'ENVIE', 'MAL', 'EAU', 'MÉDECIN', 'DOULEUR', 'SOUFFLE', 'TOILETTE', 'MÉDICAMENT', 'MERCI'],
+      A: ['SOIF', 'FAIM', 'AIDE', 'MAL', 'EAU', 'MÉDECIN', 'DOULEUR', 'TOILETTE', 'MERCI'],
+      SUIS: ['MALADE', 'FATIGUE', 'ALORS', 'BIEN', 'MAL', 'SEUL'],
+      EST: ['MALADE', 'BIEN', 'FATIGUE', 'SEUL'],
+      MANGE: ['BIEN', 'MAINTENANT', 'DORMIR', 'MANGER'],
+      ALLER: ['MAISON', 'MÉDECIN', 'TOILETTE', 'MANGER'],
+      DORMIR: ['MAINTENANT', 'BIEN', 'PLUS', 'PLUS_TARD']
+    };
+
+    const NATURAL_WORDS_BY_SEQUENCE = {
+      '': ['JE', 'TU', 'IL', 'ELLE', 'NOUS', 'VOUS', 'ILS', 'ELLES', 'ON', 'BONJOUR', 'BONSOIR', 'MERCI'],
+      JE: ['AI', 'VEUX', 'SUIS', 'PEUX', 'DOIS', 'VOUDRAIS', 'AIMERAIS', 'MANGE', 'ALLER', 'DORMIR', 'AIMER', 'PARLER'],
+      TU: ['VEUX', 'PEUX', 'DOIS', 'MANGE', 'ALLER', 'DORMIR', 'AIMER', 'PARLER'],
+      IL: ['A', 'VEUT', 'EST', 'PEUT', 'DOIT', 'MANGE', 'ALLER', 'DORMIR', 'PARLER'],
+      ELLE: ['A', 'VEUT', 'EST', 'PEUT', 'DOIT', 'MANGE', 'ALLER', 'DORMIR', 'PARLER'],
+      'JE VEUX': ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      'JE PEUX': ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      'JE DOIS': ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      'JE AI': ['SOIF', 'FAIM', 'AIDE', 'MAL', 'EAU', 'MEDECIN', 'DOULEUR', 'TOILETTE'],
+      'JE VOUDRAIS': ['AIDE', 'EAU', 'MANGER', 'BOIRE', 'DORMIR', 'TOILETTE', 'MEDECIN', 'PARLER'],
+      'JE AIMERAIS': ['AIDE', 'EAU', 'MANGER', 'BOIRE', 'DORMIR', 'TOILETTE', 'MEDECIN', 'PARLER'],
+      'JE SUIS': ['MALADE', 'FATIGUE', 'SEUL', 'BIEN', 'MAL'],
+      'JE MANGE': ['PAIN', 'POMME', 'FROMAGE', 'EAU', 'BIEN'],
+      'JE ALLER': ['MAISON', 'MEDECIN', 'TOILETTE', 'TRAVAIL', 'ECOLE'],
+      'JE DORMIR': ['MAINTENANT', 'BIEN', 'PLUS', 'NUIT']
+    };
+
+    const els = {
+      finalText: document.querySelector('#final-text'),
+      currentWord: document.querySelector('#current-word'),
+      proposalText: document.querySelector('#proposal-text'),
+      proposalHint: document.querySelector('#proposal-hint'),
+      probableWords: document.querySelector('#probable-words'),
+      manualWordInput: document.querySelector('#manual-word-input'),
+      status: document.querySelector('#status'),
+      yesButton: document.querySelector('#yes-button'),
+      noButton: document.querySelector('#no-button'),
+      validateWordButton: document.querySelector('#validate-word-button'),
+      undoButton: document.querySelector('#undo-button'),
+      newButton: document.querySelector('#new-button'),
+      deleteButton: document.querySelector('#delete-button')
+    };
+
+    const state = {
+      finalizedText: '',
+      currentWord: '',
+      lastValidatedWord: '',
+      candidates: [],
+      candidateIndex: 0,
+      history: []
+    };
+
+    function stripAccents(text) {
+      return text
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/’/g, "'")
+        .toUpperCase();
+    }
+
+    function inferWordType(word) {
+      const normalizedWord = stripAccents(word);
+      if (SUBJECTS.includes(normalizedWord)) return 'subject';
+      if (VERBS.includes(normalizedWord)) return 'verb';
+      if (COMPLEMENTS.includes(normalizedWord)) return 'complement';
+      return 'other';
+    }
+
+    let cachedLexicon = null;
+
+    function buildLexicon() {
+      if (cachedLexicon) return cachedLexicon;
+
+      const bestByKey = new Map();
+
+      [...BASE_LEXICON, ...COMMON_ORAL_WORDS].forEach((entry) => {
+        const normalizedWord = stripAccents(entry.word || '');
+        const type = entry.type || inferWordType(entry.word);
+        const key = `${normalizedWord}|${type}`;
+        const normalizedEntry = {
+          word: entry.word,
+          type,
+          normalized: normalizedWord,
+          frequency: ORAL_FREQUENCIES[normalizedWord] || Number(entry.frequency) || 80
+        };
+
+        const existing = bestByKey.get(key);
+        if (!existing || normalizedEntry.frequency > existing.frequency) {
+          bestByKey.set(key, normalizedEntry);
+        }
+      });
+
+      cachedLexicon = Array.from(bestByKey.values());
+      return cachedLexicon;
+    }
+
+    function normalizeWordLike(wordLike) {
+      if (!wordLike) return '';
+      if (typeof wordLike === 'string') return stripAccents(wordLike);
+      return stripAccents(wordLike.word || wordLike.normalized || '');
+    }
+
+    function phraseTemplateBoost(wordEntry) {
+      const previousWords = getWordContext();
+      const entryWord = stripAccents((wordEntry && (wordEntry.word || wordEntry.normalized || '')) || '');
+      const sequence = [...previousWords, entryWord].filter(Boolean);
+
+      if (!sequence.length) return 0;
+
+      for (const pattern of PHRASE_PATTERNS) {
+        const template = pattern.pattern.map((item) => stripAccents(item));
+        if (sequence.length >= template.length && JSON.stringify(sequence.slice(-template.length)) === JSON.stringify(template)) {
+          return pattern.weight;
+        }
+      }
+
+      const lastWord = previousWords[previousWords.length - 1] || '';
+      if (SUBJECTS.includes(lastWord) && (VERBS.includes(entryWord) || entryWord === 'VEUX')) return 180;
+      if (VERBS.includes(lastWord) && COMPLEMENTS.includes(entryWord)) return 220;
+      return 0;
+    }
+
+    function grammarContextScore(wordEntry) {
+      const entry = typeof wordEntry === 'string'
+        ? { word: wordEntry, normalized: stripAccents(wordEntry), type: inferWordType(wordEntry) }
+        : (wordEntry || {});
+      const normalizedWord = entry.normalized || normalizeWordLike(entry);
+      const previousWords = getWordContext();
+      const lastWord = previousWords[previousWords.length - 1] || '';
+      const type = entry.type || inferWordType(entry.word || normalizedWord);
+      const templateBoost = phraseTemplateBoost(entry);
+      const allowedNextWords = NATURAL_NEXT_WORDS_BY_LAST_WORD[lastWord] || [];
+      const wordInAllowedSet = allowedNextWords.includes(normalizedWord);
+      const lastWordUsesVerbPattern = ['VEUX', 'PEUX', 'DOIS', 'VEUT', 'PEUT'].includes(lastWord);
+
+      if (!previousWords.length) {
+        if (type === 'subject') return 300 + templateBoost;
+        if (type === 'verb') return 80 + templateBoost;
+        if (type === 'complement') return 30 + templateBoost;
+      }
+
+      if (type === 'subject') {
+        if (!lastWord) return 200 + templateBoost;
+        return 60 + templateBoost;
+      }
+
+      if (type === 'verb') {
+        if (SUBJECTS.includes(lastWord)) return 260 + templateBoost;
+        if (lastWordUsesVerbPattern) return 300 + templateBoost;
+        if (VERBS.includes(lastWord)) return 70 + templateBoost;
+        return 20 + templateBoost;
+      }
+
+      if (type === 'complement') {
+        if (lastWordUsesVerbPattern) return wordInAllowedSet ? 180 : -140 + templateBoost;
+        if (VERBS.includes(lastWord)) return 260 + templateBoost;
+        if (SUBJECTS.includes(lastWord)) return 60 + templateBoost;
+        return 30 + templateBoost;
+      }
+
+      return templateBoost;
+    }
+
+    function getExpectedWordType() {
+      const previousWords = getWordContext();
+      const lastWord = previousWords[previousWords.length - 1] || '';
+
+      if (!previousWords.length) return 'subject';
+      if (SUBJECTS.includes(lastWord)) return 'verb';
+      if (NATURAL_NEXT_WORDS_BY_LAST_WORD[lastWord] && NATURAL_NEXT_WORDS_BY_LAST_WORD[lastWord].some((word) => VERBS.includes(word))) return 'verb';
+      if (VERBS.includes(lastWord)) {
+        if (['VEUX', 'PEUX', 'DOIS', 'VEUT', 'PEUT'].includes(lastWord)) return 'verb';
+        return 'complement';
+      }
+      if (COMPLEMENTS.includes(lastWord)) return 'subject';
+      return 'subject';
+    }
+
+    function expectedTypeBonus(type) {
+      const expected = getExpectedWordType();
+      const previousWords = getWordContext();
+      const lastWord = previousWords[previousWords.length - 1] || '';
+      const allowedNextWords = NATURAL_NEXT_WORDS_BY_LAST_WORD[lastWord] || [];
+
+      if (type === expected) return 220;
+      if (allowedNextWords.length && type === 'complement' && lastWord && allowedNextWords.some((candidate) => candidate === 'ALLER' || candidate === 'DORMIR' || candidate === 'MANGER')) {
+        return -160;
+      }
+      if (expected === 'verb' && type === 'subject') return -100;
+      if (expected === 'complement' && type === 'subject') return -80;
+      if (expected === 'subject' && type === 'verb') return -40;
+      return 0;
+    }
+
+    function getWordContext() {
+      return (state.finalizedText || '')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => stripAccents(word));
+    }
+
+    function getNaturalWordList() {
+      const previousWords = getWordContext();
+      const sequence = previousWords.slice(-2).join(' ');
+      return NATURAL_WORDS_BY_SEQUENCE[sequence]
+        || NATURAL_NEXT_WORDS_BY_LAST_WORD[previousWords[previousWords.length - 1]]
+        || NATURAL_WORDS_BY_SEQUENCE[''];
+    }
+
+    function getContextWordEntries(prefix) {
+      const normalizedPrefix = stripAccents(prefix || '');
+      const naturalWords = getNaturalWordList();
+      const contextualEntries = buildLexicon().filter((entry) => {
+        return naturalWords.includes(entry.normalized)
+          && entry.normalized.startsWith(normalizedPrefix);
+      });
+
+      if (contextualEntries.length || !normalizedPrefix) return contextualEntries;
+      return buildLexicon().filter((entry) => entry.normalized.startsWith(normalizedPrefix));
+    }
+
+    function getLetterSuggestions() {
+      const prefix = stripAccents(state.currentWord);
+      const matches = getContextWordEntries(prefix);
+      const nextLetters = new Map();
+
+      matches.forEach((entry) => {
+        const remainder = entry.normalized.slice(prefix.length);
+        if (!remainder) return;
+        const letter = remainder[0];
+        const type = entry.type || inferWordType(entry.word);
+        const weight = (Number(entry.frequency) || 1) + grammarContextScore(entry) + expectedTypeBonus(type);
+        nextLetters.set(letter, (nextLetters.get(letter) || 0) + weight);
+      });
+
+      const rankedLetters = [...nextLetters.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(([letter]) => letter);
+
+      if (!rankedLetters.length && prefix) {
+        const exactWord = matches.some((entry) => entry.normalized === prefix);
+        if (exactWord) return [{ type: 'command', value: 'validate', label: 'Valider le mot' }];
+      }
+
+      return rankedLetters.map((letter) => ({
+        type: 'letter',
+        value: letter,
+        label: letter
+      }));
+    }
+
+    function scoreWord(entry) {
+      const type = entry.type || inferWordType(entry.word);
+      return (Number(entry.frequency) || 1) + grammarContextScore(entry) + expectedTypeBonus(type);
+    }
+
+    function sortLikelyWords(prefix) {
+      const normalizedPrefix = stripAccents(prefix || '');
+      const naturalWords = getNaturalWordList();
+      const matches = normalizedPrefix
+        ? buildLexicon().filter((entry) => entry.normalized.startsWith(normalizedPrefix))
+        : buildLexicon();
+
+      return matches
+        .filter((entry) => naturalWords.includes(entry.normalized))
+        .map((entry) => ({
+          ...entry,
+          score: scoreWord(entry) + (naturalWords.length - naturalWords.indexOf(entry.normalized)) * 100
+        }))
+        .sort((a, b) => b.score - a.score || b.frequency - a.frequency || a.word.length - b.word.length);
+    }
+
+    function refreshCandidates() {
+      const letterCandidates = getLetterSuggestions();
+      state.candidates = letterCandidates;
+
+      if (state.candidateIndex >= state.candidates.length) {
+        state.candidateIndex = 0;
+      }
+
+      if (!state.candidates.length) {
+        state.candidates = [{ type: 'command', value: 'reset', label: 'Nouvelle phrase' }];
+      }
+    }
+
+    function getCurrentCandidate() {
+      return state.candidates[state.candidateIndex] || null;
+    }
+
+    function snapshotState() {
+      return {
+        finalizedText: state.finalizedText,
+        currentWord: state.currentWord,
+        lastValidatedWord: state.lastValidatedWord,
+        candidateIndex: state.candidateIndex,
+        candidates: [...state.candidates]
+      };
+    }
+
+    function pushHistory() {
+      state.history.push(snapshotState());
+      if (state.history.length > 40) {
+        state.history.shift();
+      }
+    }
+
+    function undoLastAction() {
+      if (!state.history.length) {
+        renderStatus('Aucune proposition précédente.');
+        return;
+      }
+
+      const previous = state.history.pop();
+      Object.assign(state, previous);
+      state.candidates = Array.isArray(previous.candidates) ? previous.candidates.slice() : [];
+      if (!state.candidates.length) {
+        refreshCandidates();
+      }
+      render();
+      renderStatus('Retour à la proposition précédente.');
+    }
+
+    function commitWord() {
+      const word = state.currentWord.trim();
+      if (!word) return;
+      pushHistory();
+      const previousText = state.finalizedText.trimEnd();
+      state.finalizedText = previousText ? `${previousText} ${word} ` : `${word} `;
+      state.lastValidatedWord = word;
+      state.currentWord = '';
+      state.candidateIndex = 0;
+      refreshCandidates();
+      render();
+    }
+
+    function validateWord() {
+      if (!state.currentWord.trim()) {
+        renderStatus('Commence un mot avant de le valider.');
+        return;
+      }
+      commitWord();
+    }
+
+    function acceptCandidate(candidate) {
+      if (!candidate) return;
+
+      if (candidate.type === 'letter') {
+        pushHistory();
+        state.currentWord += candidate.value;
+        state.candidateIndex = 0;
+        refreshCandidates();
+        render();
+        return;
+      }
+
+      if (candidate.value === 'validate') {
+        validateWord();
+        return;
+      }
+
+      if (candidate.value === 'reset') {
+        startNewPhrase();
+      }
+    }
+
+    function rejectCandidate() {
+      pushHistory();
+      state.candidateIndex += 1;
+      if (state.candidateIndex >= state.candidates.length) {
+        state.candidateIndex = 0;
+        state.candidates = getLetterSuggestions();
+      }
+      render();
+    }
+
+    function deleteLastCharacter() {
+      if (!state.currentWord && !state.finalizedText) {
+        renderStatus('Rien à supprimer.');
+        return;
+      }
+
+      pushHistory();
+
+      if (state.currentWord) {
+        state.currentWord = state.currentWord.slice(0, -1);
+        state.candidateIndex = 0;
+        refreshCandidates();
+        render();
+        return;
+      }
+
+      state.finalizedText = state.finalizedText.trimEnd();
+      if (!state.finalizedText) {
+        renderStatus('Rien à supprimer.');
+        return;
+      }
+      state.finalizedText = state.finalizedText.slice(0, -1).trimEnd();
+      state.candidateIndex = 0;
+      state.lastValidatedWord = state.finalizedText.split(/\s+/).filter(Boolean).slice(-1)[0] || '';
+      refreshCandidates();
+      render();
+    }
+
+    function startNewPhrase() {
+      state.finalizedText = '';
+      state.currentWord = '';
+      state.lastValidatedWord = '';
+      state.candidateIndex = 0;
+      state.history = [];
+      refreshCandidates();
+      render();
+    }
+
+    function renderStatus(message) {
+      els.status.textContent = message || '';
+    }
+
+    function renderLikelyWords() {
+      const words = sortLikelyWords(state.currentWord).slice(0, 4);
+
+      els.probableWords.innerHTML = '';
+
+      if (!words.length) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'word-option';
+        button.textContent = '—';
+        button.disabled = true;
+        els.probableWords.appendChild(button);
+        return;
+      }
+
+      words.forEach((entry) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'word-option';
+        button.textContent = entry.word;
+        button.addEventListener('click', () => {
+          state.currentWord = entry.word;
+          render();
+          commitWord();
+        });
+        els.probableWords.appendChild(button);
+      });
+    }
+
+    function normalizeManualInput(value) {
+      return stripAccents(value || '').replace(/[^A-Z]/g, '').slice(0, 20);
+    }
+
+    function render() {
+      refreshCandidates();
+      const candidate = getCurrentCandidate();
+
+      els.finalText.textContent = state.finalizedText || '—';
+      if (state.currentWord) {
+        els.currentWord.textContent = state.lastValidatedWord
+          ? `Mot validé : ${state.lastValidatedWord} · Mot en cours : ${state.currentWord}`
+          : `Mot en cours : ${state.currentWord}`;
+      } else if (state.lastValidatedWord) {
+        els.currentWord.textContent = `Mot validé : ${state.lastValidatedWord}`;
+      } else {
+        els.currentWord.textContent = 'Mot en cours : —';
+      }
+      els.proposalText.textContent = candidate ? candidate.label : '—';
+      els.manualWordInput.value = state.currentWord;
+
+      els.proposalHint.textContent = state.currentWord
+        ? 'Tu peux continuer lettre par lettre ou choisir un mot probable.'
+        : 'Valide avec Oui pour accepter la lettre proposée.';
+
+      els.validateWordButton.disabled = !state.currentWord.trim();
+
+      renderLikelyWords();
+      renderStatus('');
+    }
+
+    function wireEvents() {
+      els.yesButton.addEventListener('click', () => acceptCandidate(getCurrentCandidate()));
+      els.noButton.addEventListener('click', rejectCandidate);
+      els.validateWordButton.addEventListener('click', validateWord);
+      els.undoButton.addEventListener('click', undoLastAction);
+      els.newButton.addEventListener('click', startNewPhrase);
+      els.deleteButton.addEventListener('click', deleteLastCharacter);
+      els.manualWordInput.addEventListener('input', (event) => {
+        state.currentWord = normalizeManualInput(event.target.value);
+        state.candidateIndex = 0;
+        refreshCandidates();
+        render();
+      });
+      els.manualWordInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && state.currentWord.trim()) {
+          event.preventDefault();
+          validateWord();
+        }
+      });
+      document.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+          event.preventDefault();
+          undoLastAction();
+        } else if (event.key === 'Enter') {
+          event.preventDefault();
+          if (state.currentWord.trim()) {
+            validateWord();
+          } else {
+            acceptCandidate(getCurrentCandidate());
+          }
+        } else if (event.key.toLowerCase() === 'y') {
+          acceptCandidate(getCurrentCandidate());
+        } else if (event.key.toLowerCase() === 'n' || event.key === ' ') {
+          rejectCandidate();
+        } else if (event.key === 'Backspace') {
+          deleteLastCharacter();
+        }
+      });
+    }
+    function init() {
+      wireEvents();
+      refreshCandidates();
+      render();
+    }
+
+    init();
+  </script>
+</body>
+</html>
