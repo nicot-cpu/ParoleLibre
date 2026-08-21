@@ -3,83 +3,61 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ParoleLibre</title>
+  <title>Z’Estell-IA</title>
   <style>
     :root {
       --bg: #f3f7fb;
-      --panel: #ffffff;
-      --panel-2: #eef5ff;
       --ink: #16324f;
       --muted: #5f7387;
       --line: #d9e3ee;
       --accent: #2563eb;
       --accent-2: #0f9d58;
       --danger: #c2410c;
-      --shadow: 0 14px 40px rgba(22, 50, 79, 0.10);
-      --radius: 22px;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --plum: #16324f;
+      --shadow: 0 14px 34px rgba(22, 50, 79, 0.10);
+      --radius: 14px;
+      font-family: "Avenir Next", Avenir, "Gill Sans", sans-serif;
     }
 
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at top, #ffffff 0%, var(--bg) 52%, #e8eef7 100%);
+      background:
+        radial-gradient(circle at 8% 0%, #ffffff 0%, transparent 32%),
+        linear-gradient(135deg, #ffffff 0%, #f3f7fb 54%, #e8eef7 100%);
       color: var(--ink);
     }
 
     main {
       width: min(1180px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 24px 0 32px;
+      padding: 12px 0 32px;
       display: grid;
       gap: 20px;
     }
 
-    .hero, .card {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(217, 227, 238, 0.9);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
+    .app-header {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 14px 0 0;
+      text-align: center;
     }
 
-    .hero {
-      padding: clamp(20px, 4vw, 34px);
-      display: grid;
-      gap: 10px;
-    }
-
-    .eyebrow {
+    .app-name {
       margin: 0;
-      color: var(--accent);
-      font-size: 0.78rem;
+      color: var(--plum);
+      font-size: 1.15rem;
+      line-height: 1.2;
       font-weight: 800;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(2rem, 5vw, 3.6rem);
-      line-height: 1;
-    }
-
-    .subtitle {
-      margin: 0;
-      color: var(--muted);
-      max-width: 70ch;
-      line-height: 1.5;
-    }
-
-    .layout {
-      display: grid;
-      gap: 20px;
-      grid-template-columns: 1.4fr 0.9fr;
-      align-items: start;
+      letter-spacing: 0.02em;
     }
 
     .card {
+      background: rgba(255, 255, 255, 0.90);
+      border: 1px solid rgba(217, 227, 238, 0.94);
+      box-shadow: var(--shadow);
+      border-radius: 10px;
       padding: 18px;
     }
 
@@ -87,26 +65,6 @@
       min-height: 360px;
       display: grid;
       gap: 16px;
-    }
-
-    .label-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: var(--panel-2);
-      color: var(--accent);
-      font-size: 0.85rem;
-      font-weight: 700;
     }
 
     .status {
@@ -117,20 +75,32 @@
 
     .message {
       padding: 18px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
       border: 1px solid var(--line);
       min-height: 110px;
     }
 
-    .message h2, .message h3, .message p { margin: 0; }
-    .message h2 { font-size: 0.95rem; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .message h2,
+    .message p {
+      margin: 0;
+    }
+
+    .message h2 {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
     .message .final {
       font-size: clamp(1.5rem, 3vw, 2.3rem);
       line-height: 1.2;
       white-space: pre-wrap;
       word-break: break-word;
     }
+
     .message .current {
       margin-top: 10px;
       color: var(--accent);
@@ -142,42 +112,70 @@
       display: grid;
       gap: 8px;
       padding: 18px;
-      border-radius: 18px;
-      background: #0f172a;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #2563eb 0%, #163f9b 100%);
       color: white;
     }
+
     .proposal.secondary {
-      background: linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
+      background: linear-gradient(135deg, #f8fafc 0%, #eef4ff 100%);
       border: 1px solid var(--line);
       color: var(--ink);
     }
-    .proposal.secondary .small,
-    .proposal.secondary .hint {
-      color: var(--muted);
-    }
-    .clickable-word {
-      cursor: pointer;
-      transition: transform 120ms ease, opacity 120ms ease;
-    }
-    .clickable-word:hover {
-      transform: translateY(-1px);
-      opacity: 0.9;
-    }
+
     .proposal .small {
-      color: rgba(255,255,255,0.72);
+      color: rgba(255, 255, 255, 0.72);
       font-size: 0.84rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
+
+    .proposal.secondary .small {
+      color: var(--muted);
+    }
+
     .proposal .big {
       font-size: clamp(2rem, 6vw, 4rem);
       line-height: 1;
       font-weight: 800;
       word-break: break-word;
     }
+
     .proposal .hint {
-      color: rgba(255,255,255,0.78);
+      color: rgba(255, 255, 255, 0.78);
       line-height: 1.45;
+    }
+
+    .word-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .word-option {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--ink);
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 120ms ease, border-color 120ms ease, opacity 120ms ease;
+    }
+
+    .word-option:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      background: #eef5ff;
+      opacity: 0.96;
+    }
+
+    .word-option:disabled {
+      cursor: default;
+      opacity: 0.5;
+      transform: none;
     }
 
     .actions {
@@ -186,13 +184,18 @@
       gap: 12px;
     }
 
-    button, select, input, textarea {
+    .actions .full {
+      grid-column: 1 / -1;
+    }
+
+    button,
+    input {
       font: inherit;
     }
 
     button {
       border: 0;
-      border-radius: 16px;
+      border-radius: 11px;
       padding: 14px 16px;
       min-height: 52px;
       cursor: pointer;
@@ -200,145 +203,87 @@
       transition: transform 140ms ease, opacity 140ms ease, background 140ms ease;
       -webkit-tap-highlight-color: transparent;
     }
+
     button:hover { transform: translateY(-1px); }
     button:disabled { cursor: wait; opacity: 0.55; transform: none; }
 
     .yes { background: var(--accent-2); color: white; }
-    .no { background: var(--accent); color: white; }
+    .no { background: #d9776a; color: white; }
     .ghost { background: #eaf1fb; color: var(--ink); }
     .danger { background: #fee2e2; color: #991b1b; }
-    .full { grid-column: 1 / -1; }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .stat {
-      padding: 14px;
-      border-radius: 16px;
-      background: #f8fbff;
-      border: 1px solid var(--line);
-    }
-    .stat strong {
-      display: block;
-      font-size: 1.2rem;
-      margin-bottom: 4px;
-    }
-    .stat span {
-      color: var(--muted);
-      font-size: 0.82rem;
-    }
-
-    .controls, .custom-form {
-      display: grid;
-      gap: 12px;
-    }
-
-    .controls-grid {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .field {
       display: grid;
       gap: 6px;
     }
+
     .field label {
       font-size: 0.85rem;
       color: var(--muted);
       font-weight: 700;
     }
-    input, select, textarea {
+
+    input {
       width: 100%;
       border: 1px solid var(--line);
-      background: white;
+      background: #ffffff;
       color: var(--ink);
       border-radius: 14px;
       padding: 12px 14px;
     }
-    textarea { min-height: 96px; resize: vertical; }
-    input:focus, select:focus, textarea:focus {
-      outline: 3px solid rgba(37, 99, 235, 0.18);
+
+    input:focus {
+      outline: 3px solid rgba(189, 111, 104, 0.18);
       border-color: var(--accent);
     }
 
-    .list {
-      display: grid;
-      gap: 10px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    .list li {
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: #f8fbff;
-      border: 1px solid var(--line);
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .footer-note {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.85rem;
-      line-height: 1.45;
-    }
-
     @media (max-width: 960px) {
-      .layout { grid-template-columns: 1fr; }
       .screen { min-height: unset; }
     }
 
     @media (max-width: 720px) {
-      main { width: min(100% - 20px, 1180px); padding-top: 12px; }
-      .hero { padding: 18px 16px; }
-      h1 { font-size: clamp(1.8rem, 8vw, 2.5rem); }
+      .app-header { width: min(100% - 20px, 1180px); padding-top: 10px; }
+      .app-name { font-size: 1.05rem; }
+      main { width: min(100% - 20px, 1180px); padding-top: 10px; }
       .card { padding: 14px; }
       .screen { gap: 12px; }
       .proposal, .message { padding: 14px; }
       .proposal .big { font-size: clamp(2.1rem, 12vw, 3.2rem); }
-      .stats { grid-template-columns: 1fr; }
-      .controls-grid, .actions { grid-template-columns: 1fr 1fr; }
+      .word-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .actions { grid-template-columns: 1fr 1fr; }
       button { min-height: 56px; }
     }
 
     @media (max-width: 480px) {
-      .layout { gap: 14px; }
-      .actions, .controls-grid, .stats { grid-template-columns: 1fr; }
       .proposal .big { font-size: clamp(2.3rem, 18vw, 3rem); }
       .message .final { font-size: clamp(1.3rem, 8vw, 2rem); }
       .message .current { font-size: clamp(1rem, 6vw, 1.5rem); }
-      .badge { font-size: 0.75rem; }
       button { font-size: 0.97rem; }
     }
   </style>
 </head>
 <body>
+  <header class="app-header">
+    <h1 class="app-name">Z’Estell-IA</h1>
+  </header>
   <main>
-    <section class="hero">
-      <p class="eyebrow">ParoleLibre</p>
-      <h1>ParoleLibre</h1>
-      <p class="subtitle">
-        Une interface simple pour construire des mots et des phrases avec une validation binaire.
-        L'application propose des lettres, puis des mots, pour parler plus librement.
-      </p>
-    </section>
-
-    <div class="layout">
-      <section class="card screen" aria-labelledby="screen-title">
-        <div class="label-row">
-          <div class="badge" id="mode-badge">Mode : lettre</div>
-        </div>
-
+    <section class="card screen" aria-labelledby="screen-title">
         <div class="message" aria-live="polite">
           <h2 id="screen-title">Message en cours</h2>
           <div class="final" id="final-text">—</div>
           <div class="current" id="current-word">Mot en cours : —</div>
+        </div>
+
+        <div class="field">
+          <label for="manual-word-input">Compléter le mot en cours</label>
+          <input
+            id="manual-word-input"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            autocapitalize="characters"
+            placeholder="Tapez ou complétez le mot"
+            aria-label="Compléter le mot en cours"
+          >
         </div>
 
         <div class="proposal">
@@ -348,78 +293,27 @@
         </div>
 
         <div class="proposal secondary">
-          <div class="small">Mot probable</div>
-          <button class="big clickable-word" id="best-word" type="button">—</button>
-          <div class="hint" id="best-word-hint">Le mot le plus fréquent dans la langue française pour ce préfixe.</div>
+          <div class="small">Mots probables</div>
+          <div class="word-grid" id="probable-words"></div>
         </div>
 
         <div class="actions">
           <button class="yes" id="yes-button">Oui</button>
           <button class="no" id="no-button">Non</button>
           <button class="ghost" id="validate-word-button">Valider le mot</button>
-          <button class="ghost" id="undo-button">Retour à la lettre précédente</button>
-          <button class="ghost" id="new-button">Nouvelle phrase</button>
+          <button class="ghost" id="undo-button">Lettre précédente</button>
+          <button class="ghost full" id="new-button">Nouvelle phrase</button>
           <button class="danger full" id="delete-button">Supprimer le dernier caractère</button>
         </div>
 
-        <div class="stats">
-          <div class="stat"><strong id="stat-words">0</strong><span>Mots validés</span></div>
-          <div class="stat"><strong id="stat-chars">0</strong><span>Caractères saisis</span></div>
-          <div class="stat"><strong id="stat-started">0 min</strong><span>Session active</span></div>
-        </div>
-
         <p class="status" id="status" aria-live="polite"></p>
-      </section>
-
-      <aside class="card controls">
-        <section>
-          <div class="label-row" style="margin-bottom:10px;">
-            <div class="badge">Suggestions</div>
-          </div>
-          <ul class="list" id="suggestions"></ul>
-        </section>
-
-        <p class="footer-note">
-          Prochaine étape logique : relier cet écran à un stockage local plus complet et à un vrai modèle de prédiction de mots.
-        </p>
-      </aside>
-    </div>
+    </section>
   </main>
 
   <script>
     const LETTERS = [
       'E', 'A', 'I', 'S', 'N', 'T', 'R', 'U', 'L', 'O', 'D', 'C', 'P', 'M', 'V', 'Q', 'B', 'H', 'G', 'F', 'X', 'J', 'Y', 'W', 'K', 'Z'
     ];
-
-    const BIGRAMS = {
-      '': LETTERS,
-      A: ['N', 'I', 'R', 'L', 'U', 'T', 'M', 'V', 'S', 'P'],
-      B: ['R', 'E', 'A', 'O', 'L', 'I', 'U', 'S', 'T'],
-      C: ['H', 'A', 'E', 'O', 'R', 'I', 'U', 'T', 'L', 'S'],
-      D: ['E', 'A', 'U', 'O', 'I', 'R', 'S', 'T', 'N', 'L'],
-      E: ['S', 'N', 'R', 'T', 'L', 'M', 'D', 'C', 'P', 'A'],
-      F: ['A', 'E', 'I', 'U', 'R', 'O', 'L', 'T'],
-      G: ['E', 'A', 'I', 'U', 'R', 'O', 'L', 'N'],
-      H: ['A', 'E', 'I', 'O', 'U', 'R', 'T'],
-      I: ['L', 'N', 'S', 'T', 'R', 'E', 'O', 'A'],
-      J: ['E', 'A', 'O', 'U', 'I', 'R'],
-      K: ['E', 'A', 'I', 'O', 'U', 'S'],
-      L: ['E', 'A', 'I', 'U', 'O', 'S', 'R', 'T'],
-      M: ['E', 'A', 'I', 'U', 'O', 'P', 'B', 'R'],
-      N: ['E', 'T', 'S', 'A', 'I', 'O', 'U', 'R'],
-      O: ['N', 'U', 'I', 'R', 'N', 'M', 'T', 'L'],
-      P: ['E', 'A', 'O', 'R', 'I', 'U', 'L', 'T'],
-      Q: ['U'],
-      R: ['E', 'A', 'I', 'O', 'U', 'S', 'T', 'N', 'L'],
-      S: ['E', 'T', 'A', 'I', 'O', 'U', 'R', 'N'],
-      T: ['E', 'R', 'A', 'I', 'O', 'U', 'S', 'N'],
-      U: ['R', 'S', 'L', 'N', 'M', 'T', 'E', 'I'],
-      V: ['E', 'A', 'I', 'O', 'U', 'R', 'S'],
-      W: ['A', 'E', 'I', 'O', 'U'],
-      X: ['E', 'A', 'I', 'O', 'U', 'T'],
-      Y: ['E', 'A', 'O', 'I', 'U', 'N'],
-      Z: ['E', 'A', 'I', 'O', 'U']
-    };
 
     const BASE_LEXICON = [
       { word: 'JE', type: 'subject', frequency: 520 },
@@ -797,9 +691,128 @@
       { word: 'GENTILLE', type: 'other', frequency: 130 }
     ];
 
-    const SUBJECTS = ['JE', 'TU', 'IL', 'ELLE', 'NOUS', 'VOUS', 'ILS', 'ELLES'];
-    const VERBS = ['AI', 'VEUX', 'SUIS', 'PEUX', 'DOIS', 'A', 'MANGE', 'ALLER', 'DORMIR', 'APPELER'];
-    const COMPLEMENTS = ['SOIF', 'FAIM', 'AIDE', 'MAL', 'EAU', 'TOILETTE', 'MÉDECIN', 'MAMAN', 'PAPA', 'CHAMBRE', 'MAISON', 'DOULEUR'];
+    const COMMON_ORAL_WORDS = [
+      { word: 'ON', type: 'subject' },
+      { word: 'AS', type: 'verb' },
+      { word: 'ES', type: 'verb' },
+      { word: 'VEUT', type: 'verb' },
+      { word: 'PEUT', type: 'verb' },
+      { word: 'DOIT', type: 'verb' },
+      { word: 'FAIT', type: 'verb' },
+      { word: 'DIT', type: 'verb' },
+      { word: 'VA', type: 'verb' },
+      { word: 'VONT', type: 'verb' },
+      { word: 'EST', type: 'verb' },
+      { word: 'LE', type: 'other' },
+      { word: 'LA', type: 'other' },
+      { word: 'LES', type: 'other' },
+      { word: 'UN', type: 'other' },
+      { word: 'UNE', type: 'other' },
+      { word: 'ET', type: 'other' },
+      { word: 'OU', type: 'other' },
+      { word: 'QUE', type: 'other' },
+      { word: 'QUI', type: 'other' },
+      { word: 'CETTE', type: 'other' },
+      { word: 'CE', type: 'other' },
+      { word: 'CA', type: 'other' },
+      { word: 'PAS', type: 'other' },
+      { word: 'ENCORE', type: 'other' },
+      { word: 'ICI', type: 'other' },
+      { word: 'LA-BAS', type: 'other' },
+      { word: 'AU', type: 'other' },
+      { word: 'AUX', type: 'other' },
+      { word: 'CHEZ', type: 'other' },
+      { word: 'SANS', type: 'other' },
+      { word: 'SUR', type: 'other' },
+      { word: 'SOUS', type: 'other' },
+      { word: 'QUAND', type: 'other' },
+      { word: 'COMME', type: 'other' },
+      { word: 'PARCE', type: 'other' },
+      { word: 'MAIS', type: 'other' },
+      { word: 'DONC', type: 'other' },
+      { word: 'VRAIMENT', type: 'other' },
+      { word: 'TRES', type: 'other' },
+      { word: 'MAINTENANT', type: 'other' },
+      { word: 'APRÈS', type: 'other' },
+      { word: 'AVANT', type: 'other' },
+      { word: 'BESOIN', type: 'complement' },
+      { word: 'ENVIE', type: 'complement' },
+      { word: 'DOULEUR', type: 'complement' },
+      { word: 'MAL', type: 'complement' },
+      { word: 'TÊTE', type: 'complement' },
+      { word: 'VENTRE', type: 'complement' },
+      { word: 'POITRINE', type: 'complement' },
+      { word: 'DOS', type: 'complement' },
+      { word: 'GORGE', type: 'complement' },
+      { word: 'SOUFFLE', type: 'complement' },
+      { word: 'RESPIRATION', type: 'complement' },
+      { word: 'NAUSÉE', type: 'complement' },
+      { word: 'VERTIGE', type: 'complement' },
+      { word: 'FIÈVRE', type: 'complement' },
+      { word: 'SOIF', type: 'complement' },
+      { word: 'FAIM', type: 'complement' },
+      { word: 'SOMMEIL', type: 'complement' },
+      { word: 'REPOS', type: 'complement' },
+      { word: 'FROID', type: 'complement' },
+      { word: 'CHAUD', type: 'complement' },
+      { word: 'CALME', type: 'complement' },
+      { word: 'LUMIÈRE', type: 'complement' },
+      { word: 'BRUIT', type: 'complement' },
+      { word: 'COUVERTURE', type: 'complement' },
+      { word: 'OREILLER', type: 'complement' },
+      { word: 'TOILETTE', type: 'complement' },
+      { word: 'DOUCHE', type: 'complement' },
+      { word: 'WC', type: 'complement' },
+      { word: 'MÉDICAMENT', type: 'complement' },
+      { word: 'INFIRMIÈRE', type: 'complement' },
+      { word: 'MÉDECIN', type: 'complement' },
+      { word: 'FAMILLE', type: 'complement' },
+      { word: 'VISITE', type: 'complement' },
+      { word: 'TÉLÉPHONE', type: 'complement' },
+      { word: 'MUSIQUE', type: 'complement' },
+      { word: 'ASSIS', type: 'other' },
+      { word: 'COUCHÉ', type: 'other' },
+      { word: 'DEBOUT', type: 'other' },
+      { word: 'VOUDRAIS', type: 'verb' },
+      { word: 'AIMERAIS', type: 'verb' },
+      { word: 'RESPIRER', type: 'verb' },
+      { word: 'TOUSSER', type: 'verb' },
+      { word: 'VOMIR', type: 'verb' },
+      { word: 'BOUGER', type: 'verb' },
+      { word: 'TOURNER', type: 'verb' },
+      { word: 'LEVER', type: 'verb' },
+      { word: 'RELEVER', type: 'verb' },
+      { word: 'CHANGER', type: 'verb' },
+      { word: 'APPELER', type: 'verb' },
+      { word: 'ATTENDRE', type: 'verb' },
+      { word: 'ARRÊTER', type: 'verb' },
+      { word: 'CONTINUER', type: 'verb' }
+    ];
+
+    const ORAL_FREQUENCIES = {
+      JE: 900, DE: 850, LE: 820, LA: 800, ET: 780, LES: 760, UN: 720, UNE: 700,
+      A: 690, EN: 670, QUE: 650, PAS: 640, POUR: 620, EST: 610, TU: 590, IL: 580,
+      ON: 570, VOUS: 550, AVEC: 530, CE: 510, CA: 500, MAIS: 490, NOUS: 480,
+      QUI: 470, OU: 450, AUX: 440, AU: 430, SUR: 420, ILS: 410, ELLE: 400,
+      AI: 390, VEUX: 380, SUIS: 370, PEUX: 360, DOIS: 350, VEUT: 340, PEUT: 330,
+      DOIT: 320, VA: 315, VONT: 300, FAIT: 295, DIT: 285, AVOIR: 280, ALLER: 275,
+      FAIRE: 270, DIRE: 265, VOIR: 255, SAVOIR: 250, POUVOIR: 245, FALLOIR: 240,
+      BIEN: 235, TRES: 230, ENCORE: 225, ICI: 220, MAINTENANT: 215, APRES: 210,
+      AVANT: 205, COMME: 200, QUAND: 195, PARCE: 190, MERCI: 185, BONJOUR: 180,
+      BESOIN: 420, ENVIE: 400, MAL: 390, DOULEUR: 380, AIDE: 370, SOIF: 360,
+      FAIM: 350, EAU: 340, TOILETTE: 330, SOMMEIL: 320, REPOS: 315, FROID: 300,
+      CHAUD: 295, CALME: 290, SOUFFLE: 280, RESPIRATION: 275, TÊTE: 270,
+      VENTRE: 265, DOS: 260, GORGE: 255, POITRINE: 250, NAUSEE: 245, VERTIGE: 240,
+      FIEVRE: 235, COUVERTURE: 230, OREILLER: 225, LUMIERE: 220, BRUIT: 215,
+      MEDICAMENT: 210, INFIRMIERE: 205, MEDECIN: 200, FAMILLE: 195, TELEPHONE: 190,
+      VISITE: 185, VOUDRAIS: 300, AIMERAIS: 290, RESPIRER: 280, BOUGER: 270,
+      TOURNER: 260, LEVER: 250, RELEVER: 245, CHANGER: 240, APPELER: 235,
+      ATTENDRE: 220, ARRETER: 215, CONTINUER: 210
+    };
+
+    const SUBJECTS = ['JE', 'TU', 'IL', 'ELLE', 'NOUS', 'VOUS', 'ILS', 'ELLES', 'ON'];
+    const VERBS = ['AI', 'AS', 'ES', 'VEUX', 'VEUT', 'SUIS', 'PEUX', 'PEUT', 'DOIS', 'DOIT', 'A', 'EST', 'VA', 'VONT', 'MANGE', 'ALLER', 'DORMIR', 'APPELER', 'VOUDRAIS', 'AIMERAIS', 'RESPIRER', 'TOUSSER', 'VOMIR', 'BOUGER', 'TOURNER', 'LEVER', 'RELEVER', 'CHANGER', 'ATTENDRE', 'ARRÊTER', 'CONTINUER'];
+    const COMPLEMENTS = ['SOIF', 'FAIM', 'AIDE', 'MAL', 'EAU', 'TOILETTE', 'MÉDECIN', 'MAMAN', 'PAPA', 'CHAMBRE', 'MAISON', 'DOULEUR', 'BESOIN', 'ENVIE', 'TÊTE', 'VENTRE', 'POITRINE', 'DOS', 'GORGE', 'SOUFFLE', 'RESPIRATION', 'NAUSÉE', 'VERTIGE', 'FIÈVRE', 'SOMMEIL', 'REPOS', 'FROID', 'CHAUD', 'CALME', 'LUMIÈRE', 'BRUIT', 'COUVERTURE', 'OREILLER', 'DOUCHE', 'WC', 'MÉDICAMENT', 'INFIRMIÈRE', 'FAMILLE', 'VISITE', 'TÉLÉPHONE', 'MUSIQUE'];
     const PHRASE_PATTERNS = [
       { pattern: ['JE', 'VEUX'], weight: 420 },
       { pattern: ['JE', 'SUIS'], weight: 380 },
@@ -815,40 +828,70 @@
       { pattern: ['JE', 'AI', 'FAIM'], weight: 420 },
       { pattern: ['JE', 'AI', 'AIDE'], weight: 390 },
       { pattern: ['JE', 'VEUX', 'ALLER'], weight: 380 },
-      { pattern: ['JE', 'VEUX', 'DORMIR'], weight: 360 }
+      { pattern: ['JE', 'VEUX', 'DORMIR'], weight: 360 },
+      { pattern: ['JE', 'VEUX', 'MANGER'], weight: 360 },
+      { pattern: ['JE', 'VEUX', 'BOIRE'], weight: 300 },
+      { pattern: ['JE', 'PEUX', 'ALLER'], weight: 340 },
+      { pattern: ['JE', 'PEUX', 'DORMIR'], weight: 330 },
+      { pattern: ['JE', 'DOIS', 'ALLER'], weight: 320 },
+      { pattern: ['JE', 'DOIS', 'REPOSER'], weight: 310 }
     ];
+
+    const NATURAL_NEXT_WORDS_BY_LAST_WORD = {
+      VEUX: ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR', 'AIDE', 'EAU', 'TOILETTE', 'MÉDECIN'],
+      PEUX: ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      DOIS: ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      VEUT: ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      PEUT: ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      AI: ['SOIF', 'FAIM', 'AIDE', 'BESOIN', 'ENVIE', 'MAL', 'EAU', 'MÉDECIN', 'DOULEUR', 'SOUFFLE', 'TOILETTE', 'MÉDICAMENT', 'MERCI'],
+      A: ['SOIF', 'FAIM', 'AIDE', 'MAL', 'EAU', 'MÉDECIN', 'DOULEUR', 'TOILETTE', 'MERCI'],
+      SUIS: ['MALADE', 'FATIGUE', 'ALORS', 'BIEN', 'MAL', 'SEUL'],
+      EST: ['MALADE', 'BIEN', 'FATIGUE', 'SEUL'],
+      MANGE: ['BIEN', 'MAINTENANT', 'DORMIR', 'MANGER'],
+      ALLER: ['MAISON', 'MÉDECIN', 'TOILETTE', 'MANGER'],
+      DORMIR: ['MAINTENANT', 'BIEN', 'PLUS', 'PLUS_TARD']
+    };
+
+    const NATURAL_WORDS_BY_SEQUENCE = {
+      '': ['JE', 'TU', 'IL', 'ELLE', 'NOUS', 'VOUS', 'ILS', 'ELLES', 'ON', 'BONJOUR', 'BONSOIR', 'MERCI'],
+      JE: ['AI', 'VEUX', 'SUIS', 'PEUX', 'DOIS', 'VOUDRAIS', 'AIMERAIS', 'MANGE', 'ALLER', 'DORMIR', 'AIMER', 'PARLER'],
+      TU: ['VEUX', 'PEUX', 'DOIS', 'MANGE', 'ALLER', 'DORMIR', 'AIMER', 'PARLER'],
+      IL: ['A', 'VEUT', 'EST', 'PEUT', 'DOIT', 'MANGE', 'ALLER', 'DORMIR', 'PARLER'],
+      ELLE: ['A', 'VEUT', 'EST', 'PEUT', 'DOIT', 'MANGE', 'ALLER', 'DORMIR', 'PARLER'],
+      'JE VEUX': ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      'JE PEUX': ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      'JE DOIS': ['ALLER', 'DORMIR', 'MANGER', 'BOIRE', 'PARLER', 'MARCHER', 'SORTIR', 'RESTER', 'PARTIR'],
+      'JE AI': ['SOIF', 'FAIM', 'AIDE', 'MAL', 'EAU', 'MEDECIN', 'DOULEUR', 'TOILETTE'],
+      'JE VOUDRAIS': ['AIDE', 'EAU', 'MANGER', 'BOIRE', 'DORMIR', 'TOILETTE', 'MEDECIN', 'PARLER'],
+      'JE AIMERAIS': ['AIDE', 'EAU', 'MANGER', 'BOIRE', 'DORMIR', 'TOILETTE', 'MEDECIN', 'PARLER'],
+      'JE SUIS': ['MALADE', 'FATIGUE', 'SEUL', 'BIEN', 'MAL'],
+      'JE MANGE': ['PAIN', 'POMME', 'FROMAGE', 'EAU', 'BIEN'],
+      'JE ALLER': ['MAISON', 'MEDECIN', 'TOILETTE', 'TRAVAIL', 'ECOLE'],
+      'JE DORMIR': ['MAINTENANT', 'BIEN', 'PLUS', 'NUIT']
+    };
 
     const els = {
       finalText: document.querySelector('#final-text'),
       currentWord: document.querySelector('#current-word'),
       proposalText: document.querySelector('#proposal-text'),
       proposalHint: document.querySelector('#proposal-hint'),
-      bestWord: document.querySelector('#best-word'),
-      bestWordHint: document.querySelector('#best-word-hint'),
+      probableWords: document.querySelector('#probable-words'),
+      manualWordInput: document.querySelector('#manual-word-input'),
       status: document.querySelector('#status'),
-      modeBadge: document.querySelector('#mode-badge'),
       yesButton: document.querySelector('#yes-button'),
       noButton: document.querySelector('#no-button'),
       validateWordButton: document.querySelector('#validate-word-button'),
       undoButton: document.querySelector('#undo-button'),
       newButton: document.querySelector('#new-button'),
-      deleteButton: document.querySelector('#delete-button'),
-      suggestions: document.querySelector('#suggestions'),
-      statWords: document.querySelector('#stat-words'),
-      statChars: document.querySelector('#stat-chars'),
-      statStarted: document.querySelector('#stat-started')
+      deleteButton: document.querySelector('#delete-button')
     };
 
     const state = {
-      startedAt: Date.now(),
       finalizedText: '',
       currentWord: '',
       lastValidatedWord: '',
-      phase: 'letter',
       candidates: [],
       candidateIndex: 0,
-      wordsValidated: 0,
-      charsTyped: 0,
       history: []
     };
 
@@ -875,7 +918,7 @@
 
       const bestByKey = new Map();
 
-      BASE_LEXICON.forEach((entry) => {
+      [...BASE_LEXICON, ...COMMON_ORAL_WORDS].forEach((entry) => {
         const normalizedWord = stripAccents(entry.word || '');
         const type = entry.type || inferWordType(entry.word);
         const key = `${normalizedWord}|${type}`;
@@ -883,7 +926,7 @@
           word: entry.word,
           type,
           normalized: normalizedWord,
-          frequency: Number(entry.frequency) || 80
+          frequency: ORAL_FREQUENCIES[normalizedWord] || Number(entry.frequency) || 80
         };
 
         const existing = bestByKey.get(key);
@@ -896,10 +939,6 @@
       return cachedLexicon;
     }
 
-    function allWords() {
-      return buildLexicon();
-    }
-
     function normalizeWordLike(wordLike) {
       if (!wordLike) return '';
       if (typeof wordLike === 'string') return stripAccents(wordLike);
@@ -907,7 +946,7 @@
     }
 
     function phraseTemplateBoost(wordEntry) {
-      const previousWords = (state.finalizedText || '').trim().split(/\s+/).filter(Boolean).map((word) => stripAccents(word));
+      const previousWords = getWordContext();
       const entryWord = stripAccents((wordEntry && (wordEntry.word || wordEntry.normalized || '')) || '');
       const sequence = [...previousWords, entryWord].filter(Boolean);
 
@@ -931,10 +970,13 @@
         ? { word: wordEntry, normalized: stripAccents(wordEntry), type: inferWordType(wordEntry) }
         : (wordEntry || {});
       const normalizedWord = entry.normalized || normalizeWordLike(entry);
-      const previousWords = (state.finalizedText || '').trim().split(/\s+/).filter(Boolean).map((word) => stripAccents(word));
+      const previousWords = getWordContext();
       const lastWord = previousWords[previousWords.length - 1] || '';
       const type = entry.type || inferWordType(entry.word || normalizedWord);
       const templateBoost = phraseTemplateBoost(entry);
+      const allowedNextWords = NATURAL_NEXT_WORDS_BY_LAST_WORD[lastWord] || [];
+      const wordInAllowedSet = allowedNextWords.includes(normalizedWord);
+      const lastWordUsesVerbPattern = ['VEUX', 'PEUX', 'DOIS', 'VEUT', 'PEUT'].includes(lastWord);
 
       if (!previousWords.length) {
         if (type === 'subject') return 300 + templateBoost;
@@ -949,11 +991,13 @@
 
       if (type === 'verb') {
         if (SUBJECTS.includes(lastWord)) return 260 + templateBoost;
+        if (lastWordUsesVerbPattern) return 300 + templateBoost;
         if (VERBS.includes(lastWord)) return 70 + templateBoost;
         return 20 + templateBoost;
       }
 
       if (type === 'complement') {
+        if (lastWordUsesVerbPattern) return wordInAllowedSet ? 180 : -140 + templateBoost;
         if (VERBS.includes(lastWord)) return 260 + templateBoost;
         if (SUBJECTS.includes(lastWord)) return 60 + templateBoost;
         return 30 + templateBoost;
@@ -963,56 +1007,83 @@
     }
 
     function getExpectedWordType() {
-      const previousWords = (state.finalizedText || '').trim().split(/\s+/).filter(Boolean).map((word) => stripAccents(word));
+      const previousWords = getWordContext();
       const lastWord = previousWords[previousWords.length - 1] || '';
 
       if (!previousWords.length) return 'subject';
       if (SUBJECTS.includes(lastWord)) return 'verb';
-      if (VERBS.includes(lastWord)) return 'complement';
+      if (NATURAL_NEXT_WORDS_BY_LAST_WORD[lastWord] && NATURAL_NEXT_WORDS_BY_LAST_WORD[lastWord].some((word) => VERBS.includes(word))) return 'verb';
+      if (VERBS.includes(lastWord)) {
+        if (['VEUX', 'PEUX', 'DOIS', 'VEUT', 'PEUT'].includes(lastWord)) return 'verb';
+        return 'complement';
+      }
       if (COMPLEMENTS.includes(lastWord)) return 'subject';
       return 'subject';
     }
 
     function expectedTypeBonus(type) {
       const expected = getExpectedWordType();
+      const previousWords = getWordContext();
+      const lastWord = previousWords[previousWords.length - 1] || '';
+      const allowedNextWords = NATURAL_NEXT_WORDS_BY_LAST_WORD[lastWord] || [];
+
       if (type === expected) return 220;
+      if (allowedNextWords.length && type === 'complement' && lastWord && allowedNextWords.some((candidate) => candidate === 'ALLER' || candidate === 'DORMIR' || candidate === 'MANGER')) {
+        return -160;
+      }
       if (expected === 'verb' && type === 'subject') return -100;
       if (expected === 'complement' && type === 'subject') return -80;
       if (expected === 'subject' && type === 'verb') return -40;
       return 0;
     }
 
-    function buildLetterCandidates() {
+    function getWordContext() {
+      return (state.finalizedText || '')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => stripAccents(word));
+    }
+
+    function getNaturalWordList() {
+      const previousWords = getWordContext();
+      const sequence = previousWords.slice(-2).join(' ');
+      return NATURAL_WORDS_BY_SEQUENCE[sequence]
+        || NATURAL_NEXT_WORDS_BY_LAST_WORD[previousWords[previousWords.length - 1]]
+        || NATURAL_WORDS_BY_SEQUENCE[''];
+    }
+
+    function getContextWordEntries(prefix) {
+      const normalizedPrefix = stripAccents(prefix || '');
+      const naturalWords = getNaturalWordList();
+      const contextualEntries = buildLexicon().filter((entry) => {
+        return naturalWords.includes(entry.normalized)
+          && entry.normalized.startsWith(normalizedPrefix);
+      });
+
+      if (contextualEntries.length || !normalizedPrefix) return contextualEntries;
+      return buildLexicon().filter((entry) => entry.normalized.startsWith(normalizedPrefix));
+    }
+
+    function getLetterSuggestions() {
       const prefix = stripAccents(state.currentWord);
-      const expectedType = getExpectedWordType();
-
-      if (!prefix) {
-        const starterLetters = new Map();
-        allWords().forEach((entry) => {
-          const type = entry.type || inferWordType(entry.word);
-          if (type !== expectedType) return;
-          if (!entry.normalized.length) return;
-          const letter = entry.normalized[0];
-          starterLetters.set(letter, (starterLetters.get(letter) || 0) + (Number(entry.frequency) || 40) + expectedTypeBonus(type));
-        });
-
-        const orderedLetters = [...new Set([...starterLetters.entries()].sort((a, b) => b[1] - a[1]).map(([letter]) => letter).concat(LETTERS))];
-        return orderedLetters.map((letter) => ({ type: 'letter', value: letter, label: letter }));
-      }
-
-      const matches = allWords().filter((entry) => entry.normalized.startsWith(prefix));
+      const contextualMatches = getContextWordEntries(prefix);
+      const globalMatches = buildLexicon().filter((entry) => entry.normalized.startsWith(prefix));
       const nextLetters = new Map();
 
-      if (matches.length) {
-        matches.forEach((entry) => {
+      function addLetterWeights(entries, contextBonus = 0) {
+        entries.forEach((entry) => {
           const remainder = entry.normalized.slice(prefix.length);
           if (!remainder) return;
           const letter = remainder[0];
           const type = entry.type || inferWordType(entry.word);
-          const weight = (Number(entry.frequency) || 1) + grammarContextScore(entry) + expectedTypeBonus(type);
+          const weight = (Number(entry.frequency) || 1) + grammarContextScore(entry) + expectedTypeBonus(type) + contextBonus;
           nextLetters.set(letter, (nextLetters.get(letter) || 0) + weight);
         });
       }
+
+      addLetterWeights(globalMatches);
+      addLetterWeights(contextualMatches, 220);
 
       const rankedLetters = [...nextLetters.entries()]
         .sort((a, b) => b[1] - a[1])
@@ -1027,60 +1098,30 @@
       }));
     }
 
-    function getWordMatches(prefix) {
-      const normalizedPrefix = stripAccents(prefix || '');
-      const exactMatches = allWords().filter((entry) => entry.normalized.startsWith(normalizedPrefix) && entry.normalized.length >= normalizedPrefix.length);
-      if (exactMatches.length) return exactMatches;
-      if (!normalizedPrefix) return [];
-      const fallback = allWords().filter((entry) => entry.normalized.startsWith(normalizedPrefix[0]) && entry.normalized.length >= 2);
-      return fallback.length ? fallback : allWords().slice(0, 40);
-    }
-
-    function scoreWordEntry(entry) {
+    function scoreWord(entry) {
       const type = entry.type || inferWordType(entry.word);
       return (Number(entry.frequency) || 1) + grammarContextScore(entry) + expectedTypeBonus(type);
     }
 
-    function rankWordEntries(prefix) {
+    function sortLikelyWords(prefix) {
       const normalizedPrefix = stripAccents(prefix || '');
+      const naturalWords = getNaturalWordList();
       const matches = normalizedPrefix
-        ? allWords().filter((entry) => entry.normalized.startsWith(normalizedPrefix))
-        : allWords();
+        ? buildLexicon().filter((entry) => entry.normalized.startsWith(normalizedPrefix))
+        : buildLexicon();
 
       return matches
-        .map((entry) => ({ ...entry, score: scoreWordEntry(entry) }))
+        .filter((entry) => naturalWords.includes(entry.normalized))
+        .map((entry) => ({
+          ...entry,
+          score: scoreWord(entry) + (naturalWords.length - naturalWords.indexOf(entry.normalized)) * 100
+        }))
         .sort((a, b) => b.score - a.score || b.frequency - a.frequency || a.word.length - b.word.length);
     }
 
-    function buildWordCandidates() {
-      const prefix = stripAccents(state.currentWord);
-      if (!prefix) return [];
-
-      return rankWordEntries(prefix)
-        .slice(0, 4)
-        .map((entry) => ({
-          type: 'word',
-          value: entry.word,
-          label: entry.word
-        }));
-    }
-
-    function buildSeparatorCandidates() {
-      return [
-        { type: 'separator', value: ' ', label: 'Espace' },
-        { type: 'separator', value: '.', label: 'Point' },
-        { type: 'separator', value: '?', label: 'Point d’interrogation' },
-        { type: 'separator', value: '!', label: 'Point d’exclamation' }
-      ];
-    }
-
-    function rebuildCandidates() {
-      if (state.phase === 'separator') {
-        state.candidates = buildSeparatorCandidates();
-      } else {
-        const letterCandidates = buildLetterCandidates();
-        state.candidates = letterCandidates;
-      }
+    function refreshCandidates() {
+      const letterCandidates = getLetterSuggestions();
+      state.candidates = letterCandidates;
 
       if (state.candidateIndex >= state.candidates.length) {
         state.candidateIndex = 0;
@@ -1091,7 +1132,7 @@
       }
     }
 
-    function currentCandidate() {
+    function getCurrentCandidate() {
       return state.candidates[state.candidateIndex] || null;
     }
 
@@ -1100,12 +1141,8 @@
         finalizedText: state.finalizedText,
         currentWord: state.currentWord,
         lastValidatedWord: state.lastValidatedWord,
-        phase: state.phase,
         candidateIndex: state.candidateIndex,
-        candidates: [...state.candidates],
-        wordsValidated: state.wordsValidated,
-        charsTyped: state.charsTyped,
-        startedAt: state.startedAt
+        candidates: [...state.candidates]
       };
     }
 
@@ -1126,7 +1163,7 @@
       Object.assign(state, previous);
       state.candidates = Array.isArray(previous.candidates) ? previous.candidates.slice() : [];
       if (!state.candidates.length) {
-        rebuildCandidates();
+        refreshCandidates();
       }
       render();
       renderStatus('Retour à la proposition précédente.');
@@ -1136,13 +1173,12 @@
       const word = state.currentWord.trim();
       if (!word) return;
       pushHistory();
-      state.finalizedText = state.finalizedText ? `${state.finalizedText} ${word} ` : `${word} `;
+      const previousText = state.finalizedText.trimEnd();
+      state.finalizedText = previousText ? `${previousText} ${word} ` : `${word} `;
       state.lastValidatedWord = word;
       state.currentWord = '';
-      state.wordsValidated += 1;
-      state.phase = 'letter';
       state.candidateIndex = 0;
-      rebuildCandidates();
+      refreshCandidates();
       render();
     }
 
@@ -1154,45 +1190,20 @@
       commitWord();
     }
 
-    function commitSeparator(value) {
-      pushHistory();
-      if (value === ' ') {
-        state.finalizedText = state.finalizedText ? `${state.finalizedText} ` : '';
-        state.phase = 'letter';
-      } else {
-        state.finalizedText = state.finalizedText.trimEnd();
-        state.finalizedText += value;
-        state.phase = 'letter';
-      }
-      state.candidateIndex = 0;
-      rebuildCandidates();
-      render();
-    }
-
     function acceptCandidate(candidate) {
       if (!candidate) return;
 
       if (candidate.type === 'letter') {
         pushHistory();
         state.currentWord += candidate.value;
-        state.charsTyped += 1;
         state.candidateIndex = 0;
-        rebuildCandidates();
+        refreshCandidates();
         render();
         return;
       }
 
-      if (candidate.type === 'word') {
-        pushHistory();
-        state.currentWord = candidate.value;
-        state.charsTyped += candidate.value.length;
-        render();
-        commitWord();
-        return;
-      }
-
-      if (candidate.type === 'separator') {
-        commitSeparator(candidate.value);
+      if (candidate.value === 'validate') {
+        validateWord();
         return;
       }
 
@@ -1206,9 +1217,7 @@
       state.candidateIndex += 1;
       if (state.candidateIndex >= state.candidates.length) {
         state.candidateIndex = 0;
-        if (state.phase !== 'separator') {
-          state.candidates = buildLetterCandidates();
-        }
+        state.candidates = getLetterSuggestions();
       }
       render();
     }
@@ -1224,7 +1233,7 @@
       if (state.currentWord) {
         state.currentWord = state.currentWord.slice(0, -1);
         state.candidateIndex = 0;
-        rebuildCandidates();
+        refreshCandidates();
         render();
         return;
       }
@@ -1235,10 +1244,9 @@
         return;
       }
       state.finalizedText = state.finalizedText.slice(0, -1).trimEnd();
-      state.phase = 'letter';
       state.candidateIndex = 0;
       state.lastValidatedWord = state.finalizedText.split(/\s+/).filter(Boolean).slice(-1)[0] || '';
-      rebuildCandidates();
+      refreshCandidates();
       render();
     }
 
@@ -1246,13 +1254,9 @@
       state.finalizedText = '';
       state.currentWord = '';
       state.lastValidatedWord = '';
-      state.phase = 'letter';
       state.candidateIndex = 0;
-      state.wordsValidated = 0;
-      state.charsTyped = 0;
-      state.startedAt = Date.now();
       state.history = [];
-      rebuildCandidates();
+      refreshCandidates();
       render();
     }
 
@@ -1260,55 +1264,42 @@
       els.status.textContent = message || '';
     }
 
-    function renderSuggestions() {
-      const suggestions = rankWordEntries(state.currentWord).slice(0, 5);
+    function renderLikelyWords() {
+      const words = sortLikelyWords(state.currentWord).slice(0, 4);
 
-      els.suggestions.innerHTML = '';
-      if (!suggestions.length) {
-        const li = document.createElement('li');
-        li.textContent = 'Aucune suggestion pour le moment.';
-        els.suggestions.appendChild(li);
+      els.probableWords.innerHTML = '';
+
+      if (!words.length) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'word-option';
+        button.textContent = '—';
+        button.disabled = true;
+        els.probableWords.appendChild(button);
         return;
       }
 
-      suggestions.forEach((entry) => {
-        const li = document.createElement('li');
-        li.innerHTML = `<button type="button" class="ghost" data-word="${entry.word}" style="width:100%; text-align:left; padding:10px 12px; border-radius:12px;">${entry.word}</button>`;
-        const button = li.querySelector('button');
+      words.forEach((entry) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'word-option';
+        button.textContent = entry.word;
         button.addEventListener('click', () => {
           state.currentWord = entry.word;
-          state.charsTyped += entry.word.length;
           render();
           commitWord();
         });
-        els.suggestions.appendChild(li);
+        els.probableWords.appendChild(button);
       });
     }
 
-    function bestMatchingWord() {
-      const prefix = stripAccents(state.currentWord);
-      if (!prefix) {
-        return '—';
-      }
-
-      const words = rankWordEntries(prefix);
-      return words[0]?.word || '—';
-    }
-
-    function probablePhraseSummary() {
-      const words = (state.finalizedText || '').trim().split(/\s+/).filter(Boolean);
-      if (!words.length) return 'Phrase probable : JE VEUX ...';
-      const lastWord = stripAccents(words[words.length - 1]);
-      if (SUBJECTS.includes(lastWord)) return 'Phrase probable : JE VEUX ...';
-      if (VERBS.includes(lastWord)) return 'Phrase probable : JE VEUX ... + besoin / aide / eau';
-      return `Phrase probable : ${words.join(' ')} ...`;
+    function normalizeManualInput(value) {
+      return stripAccents(value || '').replace(/[^A-Z]/g, '').slice(0, 20);
     }
 
     function render() {
-      rebuildCandidates();
-      const candidate = currentCandidate();
-      const probableWord = bestMatchingWord();
-      const phraseHint = probablePhraseSummary();
+      refreshCandidates();
+      const candidate = getCurrentCandidate();
 
       els.finalText.textContent = state.finalizedText || '—';
       if (state.currentWord) {
@@ -1321,48 +1312,37 @@
         els.currentWord.textContent = 'Mot en cours : —';
       }
       els.proposalText.textContent = candidate ? candidate.label : '—';
-      els.bestWord.textContent = probableWord;
-      els.bestWord.disabled = probableWord === '—';
-      els.bestWordHint.textContent = probableWord === '—'
-        ? `${phraseHint}. Aucun mot connu pour ce préfixe.`
-        : `${phraseHint}. Mot le plus probable pour ${state.currentWord || 'ce préfixe'} : ${probableWord}`;
-      els.modeBadge.textContent = `Mode : ${state.phase === 'separator' ? 'validation de mot' : 'lettre'}`;
-      els.statWords.textContent = String(state.wordsValidated);
-      els.statChars.textContent = String(state.charsTyped);
-      els.statStarted.textContent = `${Math.max(0, Math.floor((Date.now() - state.startedAt) / 60000))} min`;
+      els.manualWordInput.value = state.currentWord;
 
-      if (candidate?.type === 'word') {
-        els.proposalHint.textContent = 'Valide avec Oui pour terminer le mot.';
-      } else if (candidate?.type === 'separator') {
-        els.proposalHint.textContent = 'Valide avec Oui pour ajouter ce séparateur.';
-      } else {
-        els.proposalHint.textContent = state.currentWord
-          ? `${phraseHint}. Tu peux continuer lettre par lettre ou valider le mot maintenant.`
-          : 'Valide avec Oui pour accepter la lettre proposée.';
-      }
+      els.proposalHint.textContent = state.currentWord
+        ? 'Tu peux continuer lettre par lettre ou choisir un mot probable.'
+        : 'Valide avec Oui pour accepter la lettre proposée.';
 
       els.validateWordButton.disabled = !state.currentWord.trim();
 
-      renderSuggestions();
+      renderLikelyWords();
       renderStatus('');
     }
 
     function wireEvents() {
-      els.yesButton.addEventListener('click', () => acceptCandidate(currentCandidate()));
+      els.yesButton.addEventListener('click', () => acceptCandidate(getCurrentCandidate()));
       els.noButton.addEventListener('click', rejectCandidate);
       els.validateWordButton.addEventListener('click', validateWord);
       els.undoButton.addEventListener('click', undoLastAction);
       els.newButton.addEventListener('click', startNewPhrase);
       els.deleteButton.addEventListener('click', deleteLastCharacter);
-      els.bestWord.addEventListener('click', () => {
-        const word = bestMatchingWord();
-        if (word === '—' || !state.currentWord) return;
-        state.currentWord = word;
-        state.charsTyped += word.length;
+      els.manualWordInput.addEventListener('input', (event) => {
+        state.currentWord = normalizeManualInput(event.target.value);
+        state.candidateIndex = 0;
+        refreshCandidates();
         render();
-        commitWord();
       });
-
+      els.manualWordInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && state.currentWord.trim()) {
+          event.preventDefault();
+          validateWord();
+        }
+      });
       document.addEventListener('keydown', (event) => {
         if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
           event.preventDefault();
@@ -1372,10 +1352,10 @@
           if (state.currentWord.trim()) {
             validateWord();
           } else {
-            acceptCandidate(currentCandidate());
+            acceptCandidate(getCurrentCandidate());
           }
         } else if (event.key.toLowerCase() === 'y') {
-          acceptCandidate(currentCandidate());
+          acceptCandidate(getCurrentCandidate());
         } else if (event.key.toLowerCase() === 'n' || event.key === ' ') {
           rejectCandidate();
         } else if (event.key === 'Backspace') {
@@ -1385,7 +1365,7 @@
     }
     function init() {
       wireEvents();
-      rebuildCandidates();
+      refreshCandidates();
       render();
     }
 
